@@ -2,15 +2,40 @@ package com.prokey.baccaratio.service;
 
 import com.prokey.baccaratio.model.Card;
 import com.prokey.baccaratio.model.Deck;
+import com.prokey.baccaratio.model.Player;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BaccaratService {
     private Deck deck;
+    private Player player;
+    private String lastResult = "";
+    private String betType = "";
+    private int betAmount = 0;
 
     public BaccaratService() {
         this.deck = new Deck();
+        this.player = new Player("Default Player", 100); // Kezdeti zsetonok száma
     }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public boolean placeBet(String type, int amount) {
+        if (player.getChips() >= amount) {
+            this.betType = type;
+            this.betAmount = amount;
+            // Itt további logika lehet, ha szükséges
+            return true;
+        }
+        return false;
+    }
+
 
     public void setDeck(Deck deck) {
         this.deck = deck;
@@ -30,7 +55,9 @@ public class BaccaratService {
 
         // "Természetes" győzelem ellenőrzése
         if (playerTotal >= 8 || bankerTotal >= 8) {
-            return naturalWinResult(playerTotal, bankerTotal);
+            lastResult = naturalWinResult(playerTotal, bankerTotal);
+            updateChipsBasedOnResult();
+            return lastResult;
         }
 
         Card playerThirdCard = null;
@@ -39,13 +66,30 @@ public class BaccaratService {
             playerTotal = calculateTotalWithCard(playerTotal, playerThirdCard);
         }
 
-// Hasonlóan a bankár esetében
+        // Hasonlóan a bankár esetében
         if (shouldBankerDraw(bankerTotal, playerTotal, playerThirdCard)) {
             Card bankerThirdCard = deck.draw();
             bankerTotal = calculateTotalWithCard(bankerTotal, bankerThirdCard);
         }
 
-        return determineOutcome(playerTotal, bankerTotal);
+        lastResult = determineOutcome(playerTotal, bankerTotal);
+        updateChipsBasedOnResult();
+        return lastResult;
+    }
+
+    private void updateChipsBasedOnResult() {
+        // Feltételezzük, hogy a nyeremény kétszerese a tétnek, kivéve döntetlen esetén
+        if ((betType.equals("player") && lastResult.contains("Játékos nyert")) ||
+                (betType.equals("banker") && lastResult.contains("Bankár nyert"))) {
+            player.win(betAmount * 2);
+        } else if (betType.equals("tie") && lastResult.contains("Döntetlen")) {
+            player.win(betAmount * 2); // vagy egyedi logika döntetlen esetén
+        } else {
+            player.lose(betAmount);
+        }
+        // Visszaállítjuk a tét típusát és összegét, kész a következő körre
+        betType = "";
+        betAmount = 0;
     }
 
     private boolean shouldBankerDraw(int bankerTotal, int playerTotal, Card playerThirdCard) {
@@ -106,5 +150,18 @@ public class BaccaratService {
         } else {
             return "Döntetlen! Mindkét fél pontszáma: " + playerTotal;
         }
+    }
+
+    public int getChips() {
+        return player.getChips();
+    }
+
+
+    public String getLastResult() {
+        return lastResult;
+    }
+
+    public String getBetType() {
+        return betType;
     }
 }

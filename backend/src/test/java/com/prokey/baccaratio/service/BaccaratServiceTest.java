@@ -65,4 +65,55 @@ public class BaccaratServiceTest {
         verify(deckMock, times(1)).reshuffle(); // Ellenőrizzük, hogy meghívódott-e az újrakeverés
     }
 
+    @Test
+    public void testPlaceBetWithInsufficientChips() {
+        baccaratService.getPlayer().setChips(10); // Feltételezzük, hogy a játékosnak csak 10 zsetonja van
+        assertFalse(baccaratService.placeBet("player", 20)); // A tét 20, ami több, mint a játékos zsetonjai
+    }
+
+    @Test
+    public void testWinningBetUpdatesChipsCorrectly() {
+        baccaratService.getPlayer().setChips(50);
+        baccaratService.placeBet("player", 10);
+        // Konfiguráljuk úgy, hogy a "player" nyerjen (pl. játékos pontszáma 8, bankáré 7)
+        when(deckMock.draw()).thenReturn(new Card("Hearts", "8", 8), new Card("Diamonds", "K", 0),
+                new Card("Spades", "7", 7), new Card("Clubs", "Q", 0),
+                new Card("Hearts", "2", 2)); // További lapok, ha szükséges
+        baccaratService.playRound();
+        assertEquals(70, baccaratService.getPlayer().getChips()); // Feltételezzük, hogy a nyeremény kétszerese a tétnek
+    }
+    @Test
+    public void testLosingBetUpdatesChipsCorrectly() {
+        baccaratService.getPlayer().setChips(50);
+        baccaratService.placeBet("player", 10);
+        // Konfiguráljuk úgy, hogy a "player" veszít (pl. játékos pontszáma 6, bankáré 7)
+        when(deckMock.draw()).thenReturn(new Card("Hearts", "6", 6), new Card("Diamonds", "5", 5),
+                new Card("Spades", "7", 7), new Card("Clubs", "2", 2),
+                new Card("Hearts", "9", 9)); // További lapok, ha szükséges
+        baccaratService.playRound();
+        assertEquals(40, baccaratService.getPlayer().getChips()); // A tét levonásra kerül
+    }
+
+    @Test
+    public void testTieReturnsBet() {
+        baccaratService.getPlayer().setChips(50);
+        baccaratService.placeBet("tie", 10);
+        // Konfiguráljuk úgy, hogy döntetlen legyen (pl. mindkét fél pontszáma 8)
+        when(deckMock.draw()).thenReturn(new Card("Hearts", "8", 8), new Card("Diamonds", "Q", 0),
+                new Card("Spades", "8", 8), new Card("Clubs", "K", 0),
+                new Card("Hearts", "2", 2)); // További lapok, ha szükséges
+        baccaratService.playRound();
+        assertEquals(50, baccaratService.getPlayer().getChips()); // A tét visszatérítésre kerül döntetlen esetén
+    }
+
+    @Test
+    public void testInvalidBetType() {
+        assertFalse(baccaratService.placeBet("invalid_type", 10)); // Érvénytelen fogadási típus
+    }
+
+    @Test
+    public void testNegativeBetAmount() {
+        assertFalse(baccaratService.placeBet("player", -10)); // Érvénytelen fogadási összeg
+    }
+
 }
