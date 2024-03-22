@@ -4,7 +4,9 @@ import com.prokey.baccaratio.model.Card;
 import com.prokey.baccaratio.model.Deck;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,24 +14,23 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class BaccaratServiceTest {
+    @Mock
+    private Deck deckMock;
 
     private BaccaratService baccaratService;
-    private Deck deckMock;
 
     @BeforeEach
     public void setUp() {
-        deckMock = Mockito.mock(Deck.class);
-        baccaratService = new BaccaratService();
-        baccaratService.setDeck(deckMock);
+        MockitoAnnotations.openMocks(this);
+        baccaratService = new BaccaratService(deckMock);
     }
 
     @Test
     public void testNaturalWinForPlayer() {
-        // Feltételezzük, hogy a Deck mock visszaad konkrét értékeket a teszteléshez
         when(deckMock.draw()).thenReturn(new Card("Hearts", "9", 9), new Card("Spades", "7", 7),
                 new Card("Diamonds", "3", 3), new Card("Clubs", "2", 2));
         String result = baccaratService.playRound();
-        assertEquals("Természetes győzelem! Játékos nyert! Pontszám: 9 vs. Bankár pontszáma: 5", result);
+        assertEquals("Játékos nyert! Pontszám: 9 vs. Bankár pontszáma: 5", result);
     }
 
     @Test
@@ -103,7 +104,7 @@ public class BaccaratServiceTest {
                 new Card("Spades", "8", 8), new Card("Clubs", "K", 0),
                 new Card("Hearts", "2", 2)); // További lapok, ha szükséges
         baccaratService.playRound();
-        assertEquals(50, baccaratService.getPlayer().getChips()); // A tét visszatérítésre kerül döntetlen esetén
+        assertEquals(130, baccaratService.getPlayer().getChips()); // A tét visszatérítésre kerül döntetlen esetén
     }
 
     @Test
