@@ -29,20 +29,15 @@ public class BaccaratService {
     }
 
     public boolean placeBet(String type, int amount) {
-        if (amount <= 0) {
-            return false; // Érvénytelen fogadási összeg
+        if (amount <= 0 || (!type.equals("player") && !type.equals("banker") && !type.equals("tie"))) {
+            return false; // Invalid bet amount or type
         }
-        if (!type.equals("player") && !type.equals("banker") && !type.equals("tie")) {
-            return false; // Érvénytelen fogadási típus
+        if (this.player.getChips() < amount) {
+            return false; // Insufficient chips
         }
-        if (player.getChips() >= amount) {
-            this.betType = type;
-            this.betAmount = amount;
-            // Itt további logika lehet, ha szükséges
-            return true;
-        } else {
-            return false; // Nincs elegendő zseton a fogadásra
-        }
+        this.betType = type;
+        this.betAmount = amount;
+        return true;
     }
 
     public void setDeck(Deck deck) {
@@ -91,50 +86,69 @@ public class BaccaratService {
     }
 
     private void updateChipsBasedOnResult() {
-        switch (betType) {
+        int payout = 0;
+        boolean isWin = false;
+
+        switch (this.betType) {
             case "player":
-                if (lastResult.contains("Játékos nyert")) player.win(betAmount * 2);
+                if (this.lastResult.startsWith("Játékos nyert")) {
+                    payout = this.betAmount * 2;
+                    isWin = true;
+                }
                 break;
             case "banker":
-                if (lastResult.contains("Bankár nyert")) player.win((int)(betAmount * 1.95)); // Bankári győzelem esetén gyakran van egy 5% commission
+                if (this.lastResult.startsWith("Bankár nyert")) {
+                    // Considering the standard 5% commission on banker wins
+                    payout = (int) (this.betAmount * 1.95);
+                    isWin = true;
+                }
                 break;
             case "tie":
-                if (lastResult.contains("Döntetlen")) player.win(betAmount * 8); // A döntetlen esetében magasabb kifizetés
+                if (this.lastResult.startsWith("Döntetlen")) {
+                    payout = this.betAmount * 8; // Tie bets typically offer 8:1 payout
+                    isWin = true;
+                }
                 break;
             default:
-                player.lose(betAmount);
-                break;
+                break; // No additional action required for default case
         }
-        betType = "";
-        betAmount = 0;
+
+// Inside updateChipsBasedOnResult
+        if (isWin && this.betType.equals("tie")) {
+            this.player.win(payout + this.betAmount); // Ensure the original bet is also returned in case of a tie
+        } else if (isWin) {
+            this.player.win(payout);
+        } else {
+            this.player.lose(this.betAmount);
+        }
+
+        // Reset bet for next round
+        this.betType = "";
+        this.betAmount = 0;
     }
 
     private boolean shouldBankerDraw(int bankerTotal, int playerTotal, Card playerThirdCard) {
         if (bankerTotal >= 7) {
-            return false;
+            return false; // Banker stands
         }
+
         if (bankerTotal <= 2) {
-            return true;
+            return true; // Banker always draws if the total is 2 or less
         }
 
         int playerThirdCardValue = playerThirdCard != null ? playerThirdCard.getPoints() : -1;
 
-        // Bankár harmadik lapjának döntési logikája, figyelembe véve a játékos harmadik lapját
-        if (playerThirdCardValue == -1) { // Ha a játékos nem húzott harmadik lapot
-            return true;
+        if (bankerTotal == 3) {
+            return playerThirdCardValue != 8; // Banker draws unless the player's third card is an 8
+        } else if (bankerTotal == 4) {
+            return playerThirdCardValue >= 2 && playerThirdCardValue <= 7;
+        } else if (bankerTotal == 5) {
+            return playerThirdCardValue >= 4 && playerThirdCardValue <= 7;
+        } else if (bankerTotal == 6) {
+            return playerThirdCardValue == 6 || playerThirdCardValue == 7;
         }
-        switch (bankerTotal) {
-            case 3:
-                return playerThirdCardValue != 8;
-            case 4:
-                return playerThirdCardValue >= 2 && playerThirdCardValue <= 7;
-            case 5:
-                return playerThirdCardValue >= 4 && playerThirdCardValue <= 7;
-            case 6:
-                return playerThirdCardValue == 6 || playerThirdCardValue == 7;
-            default:
-                return false;
-        }
+
+        return false; // Default case if none of the above conditions are met
     }
 
     private int calculateTotal(Card... cards) {
@@ -149,13 +163,13 @@ public class BaccaratService {
         return (currentTotal + card.getPoints()) % 10;
     }
 
+    // Adjusting naturalWinResult logic for clarity
     private String naturalWinResult(int playerTotal, int bankerTotal) {
         if (playerTotal == bankerTotal) {
-            return "Döntetlen! Mindkét fél pontszáma: " + playerTotal; // Eredeti hiba javítása
-        } else if (playerTotal > bankerTotal) {
+            return "Döntetlen! Mindkét fél pontszáma: " + playerTotal;
+        } else if (playerTotal == 8 || playerTotal == 9) {
             return "Játékos nyert! Pontszám: " + playerTotal + " vs. Bankár pontszáma: " + bankerTotal;
-        }
-        else {
+        } else {
             return "Bankár nyert! Pontszám: " + bankerTotal + " vs. Játékos pontszáma: " + playerTotal;
         }
     }
@@ -166,7 +180,7 @@ public class BaccaratService {
         } else if (bankerTotal > playerTotal) {
             return "Bankár nyert! Pontszám: " + bankerTotal + " vs. Játékos pontszáma: " + playerTotal;
         } else {
-            return "Döntetlen! Mindkét fél pontszáma: " + playerTotal; // Itt egyeztetés szükséges, ha a döntetlen nem a játékos pontszámát kellene megjeleníteni
+            return "Döntetlen! Mindkét fél pontszáma: " + playerTotal;
         }
     }
 
