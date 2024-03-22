@@ -50,6 +50,17 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version> <!-- Vagy bármely kompatibilis verzió -->
+                <configuration>
+                    <source>17</source> <!-- Vagy a projektednek megfelelő Java verzió -->
+                    <target>17</target> <!-- Vagy a projektednek megfelelő Java verzió -->
+                    <compilerArgument>-parameters</compilerArgument>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

@@ -1,8 +1,13 @@
 package com.prokey.baccaratio.controller;
 
+import com.prokey.baccaratio.model.Card;
 import com.prokey.baccaratio.service.BaccaratService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/baccarat")
@@ -16,7 +21,7 @@ public class BaccaratController {
     }
 
     @PostMapping("/bet/{type}/{amount}")
-    public String placeBet(@PathVariable String type, @PathVariable int amount) {
+    public String placeBet(@PathVariable("type") String type, @PathVariable("amount") int amount) {
         // Kibővítve az új fogadási típusokkal
         if (amount <= 0) {
             return "A tét összegének pozitívnak kell lennie.";
@@ -37,6 +42,14 @@ public class BaccaratController {
     @GetMapping("/play")
     public String play() {
         return baccaratService.playRound();
+    }
+
+    @GetMapping("/cards")
+    public Map<String, List<Card>> getCards() {
+        Map<String, List<Card>> cards = new HashMap<>();
+        cards.put("playerCards", baccaratService.getPlayerCards());
+        cards.put("bankerCards", baccaratService.getBankerCards());
+        return cards;
     }
 
     @GetMapping("/result")

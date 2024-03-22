@@ -1,9 +1,11 @@
 package com.prokey.baccaratio.model;
 
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+@Component
 public class Deck {
     private List<Card> cards = new ArrayList<>();
 

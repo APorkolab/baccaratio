@@ -6,6 +6,9 @@ import com.prokey.baccaratio.model.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class BaccaratService {
     private Deck deck;
@@ -13,6 +16,9 @@ public class BaccaratService {
     private String lastResult = "";
     private String betType = "";
     private int betAmount = 0;
+    private List<Card> playerCards = new ArrayList<>();
+    private List<Card> bankerCards = new ArrayList<>();
+
 
     @Autowired
     public BaccaratService(Deck deck) {
@@ -52,36 +58,42 @@ public class BaccaratService {
             return "Nincs elég zsetonod a fogadáshoz. A játék véget ért.";
         }
 
-        Card playerCard1 = deck.draw();
-        Card playerCard2 = deck.draw();
-        Card bankerCard1 = deck.draw();
-        Card bankerCard2 = deck.draw();
+        playerCards = new ArrayList<>();
+        bankerCards = new ArrayList<>();
 
+        // A kártyák húzása
+        playerCards.add(deck.draw());
+        playerCards.add(deck.draw());
+        bankerCards.add(deck.draw());
+        bankerCards.add(deck.draw());
+
+        // Reshuffle, ha kevesebb, mint 6 kártya maradt
         if (deck.getCards().size() < 6) {
             deck.reshuffle();
         }
 
-        int playerTotal = calculateTotal(playerCard1, playerCard2);
-        int bankerTotal = calculateTotal(bankerCard1, bankerCard2);
+        int playerTotal = calculateTotal(playerCards.get(0), playerCards.get(1));
+        int bankerTotal = calculateTotal(bankerCards.get(0), bankerCards.get(1));
 
-        if (playerTotal == 8 || playerTotal == 9 || bankerTotal == 8 || bankerTotal == 9) {
-            lastResult = naturalWinResult(playerTotal, bankerTotal);
-        } else {
+        // A játék logikája
+        if (!(playerTotal == 8 || playerTotal == 9 || bankerTotal == 8 || bankerTotal == 9)) {
             Card playerThirdCard = null;
             if (playerTotal <= 5) {
                 playerThirdCard = deck.draw();
+                playerCards.add(playerThirdCard);
                 playerTotal = calculateTotalWithCard(playerTotal, playerThirdCard);
             }
 
             Card bankerThirdCard = null;
             if (shouldBankerDraw(bankerTotal, playerTotal, playerThirdCard)) {
                 bankerThirdCard = deck.draw();
+                bankerCards.add(bankerThirdCard);
                 bankerTotal = calculateTotalWithCard(bankerTotal, bankerThirdCard);
             }
-
-            lastResult = determineOutcome(playerTotal, bankerTotal);
         }
-        updateChipsBasedOnResult(playerCard1, playerCard2, bankerCard1, bankerCard2);
+
+        lastResult = determineOutcome(playerTotal, bankerTotal);
+        updateChipsBasedOnResult();
 
         // Ellenőrizzük, hogy a játékosnak van-e még zsetonja
         if (this.player.getChips() <= 0) {
@@ -91,10 +103,21 @@ public class BaccaratService {
         return lastResult;
     }
 
-    private void updateChipsBasedOnResult(Card playerCard1, Card playerCard2, Card bankerCard1, Card bankerCard2) {
+    private void updateChipsBasedOnResult() {
+        // Az első két kártya kinyerése a listákból
+        Card playerCard1 = playerCards.size() > 0 ? playerCards.get(0) : null;
+        Card playerCard2 = playerCards.size() > 1 ? playerCards.get(1) : null;
+        Card bankerCard1 = bankerCards.size() > 0 ? bankerCards.get(0) : null;
+        Card bankerCard2 = bankerCards.size() > 1 ? bankerCards.get(1) : null;
+
+        // Esetleges harmadik kártyák ellenőrzése
+        Card playerThirdCard = playerCards.size() > 2 ? playerCards.get(2) : null;
+        Card bankerThirdCard = bankerCards.size() > 2 ? bankerCards.get(2) : null;
+
         int payout = 0;
         boolean isWin = false;
 
+        // A fogadási típusok és a győztesek logikája
         switch (this.betType) {
             case "player":
                 if (this.lastResult.startsWith("Játékos nyert")) {
@@ -115,25 +138,27 @@ public class BaccaratService {
                 }
                 break;
             case "perfectPairOne":
-                if (isPerfectPair(playerCard1, playerCard2) || isPerfectPair(bankerCard1, bankerCard2)) {
+                if ((playerCard1 != null && playerCard2 != null && isPerfectPair(playerCard1, playerCard2)) ||
+                        (bankerCard1 != null && bankerCard2 != null && isPerfectPair(bankerCard1, bankerCard2))) {
                     payout = this.betAmount * 25;
                     isWin = true;
                 }
                 break;
             case "playerPair":
-                if (isPair(playerCard1, playerCard2)) {
+                if (playerCard1 != null && playerCard2 != null && isPair(playerCard1, playerCard2)) {
                     payout = this.betAmount * 11;
                     isWin = true;
                 }
                 break;
             case "bankerPair":
-                if (isPair(bankerCard1, bankerCard2)) {
+                if (bankerCard1 != null && bankerCard2 != null && isPair(bankerCard1, bankerCard2)) {
                     payout = this.betAmount * 11;
                     isWin = true;
                 }
                 break;
             case "eitherPair":
-                if (isPair(playerCard1, playerCard2) || isPair(bankerCard1, bankerCard2)) {
+                if ((playerCard1 != null && playerCard2 != null && isPair(playerCard1, playerCard2)) ||
+                        (bankerCard1 != null && bankerCard2 != null && isPair(bankerCard1, bankerCard2))) {
                     payout = this.betAmount * 5;
                     isWin = true;
                 }
@@ -209,6 +234,14 @@ public class BaccaratService {
 
     public String getBetType() {
         return betType;
+    }
+
+    public List<Card> getPlayerCards() {
+        return playerCards;
+    }
+
+    public List<Card> getBankerCards() {
+        return bankerCards;
     }
 }
 
