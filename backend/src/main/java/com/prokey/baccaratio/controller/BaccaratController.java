@@ -17,15 +17,18 @@ public class BaccaratController {
 
     @PostMapping("/bet/{type}/{amount}")
     public String placeBet(@PathVariable String type, @PathVariable int amount) {
+        // Kibővítve az új fogadási típusokkal
         if (amount <= 0) {
             return "A tét összegének pozitívnak kell lennie.";
         }
-        if (!type.equals("player") && !type.equals("banker") && !type.equals("tie")) {
-            return "Érvénytelen fogadási típus. Lehetséges értékek: 'player', 'banker', 'tie'.";
+        if (!type.equals("player") && !type.equals("banker") && !type.equals("tie")
+               && !type.equals("perfectPairOne") && !type.equals("pPair")
+                && !type.equals("eitherPair") && !type.equals("bPair")) {
+            return "Érvénytelen fogadási típus.";
         }
         boolean betPlaced = baccaratService.placeBet(type, amount);
         if (betPlaced) {
-            return "Fogadás helyezve a következőre: " + type + " összeggel: " + amount;
+            return String.format("Fogadás helyezve: %s, összeggel: %d", type, amount);
         } else {
             return "Nem sikerült a fogadást elhelyezni. Ellenőrizd a rendelkezésre álló zsetonok számát.";
         }
@@ -38,8 +41,9 @@ public class BaccaratController {
 
     @GetMapping("/result")
     public String getLastResult() {
-        return "Utolsó eredmény: " + baccaratService.getLastResult() +
-                ". Fogadásod: " + baccaratService.getBetType() +
-                ". Maradék zsetonok: " + baccaratService.getChips();
+        return String.format("Utolsó eredmény: %s. Fogadásod: %s. Maradék zsetonok: %d",
+                baccaratService.getLastResult(),
+                baccaratService.getBetType(),
+                baccaratService.getChips());
     }
 }

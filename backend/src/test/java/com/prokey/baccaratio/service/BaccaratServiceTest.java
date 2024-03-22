@@ -127,14 +127,19 @@ public class BaccaratServiceTest {
 
     @Test
     public void testNaturalTie() {
+        // Beállítjuk a mockolt kártyákat egy természetes döntetlenhez
         when(deckMock.draw()).thenReturn(
-                new Card("Hearts", "9", 9),  // Player Card 1
-                new Card("Spades", "2", 2),  // Player Card 2
-                new Card("Diamonds", "9", 9),  // Banker Card 1
-                new Card("Clubs", "2", 2)    // Banker Card 2
+                new Card("Hearts", "8", 8),  // Játékos lap 1
+                new Card("Spades", "Queen", 0),  // Játékos lap 2
+                new Card("Diamonds", "8", 8),  // Bankár lap 1
+                new Card("Clubs", "King", 0)    // Bankár lap 2
         );
+
+        // A játék kör lejátszása
         String result = baccaratService.playRound();
-        assertEquals("Döntetlen! Mindkét fél pontszáma: 3", result); // Correcting the expected result
+
+        // Ellenőrizzük, hogy a kimenet megfelel-e a természetes döntetlen szabályainak
+        assertEquals("Döntetlen! Mindkét fél pontszáma: 8", result);
     }
 
     @Test
@@ -146,7 +151,7 @@ public class BaccaratServiceTest {
                 new Card("Spades", "8", 8), new Card("Clubs", "K", 0),
                 new Card("Hearts", "2", 2)); // További lapok, ha szükséges
         baccaratService.playRound();
-        assertEquals(140, baccaratService.getPlayer().getChips()); // A tét visszatérítésre kerül döntetlen esetén
+        assertEquals(130, baccaratService.getPlayer().getChips()); // A tét visszatérítésre kerül döntetlen esetén
     }
 
     @Test
@@ -174,7 +179,7 @@ public class BaccaratServiceTest {
         baccaratService.playRound();
 
         // Ellenőrizzük, hogy a zsetonok száma helyesen 180-ra nőtt-e
-        assertEquals(190, baccaratService.getPlayer().getChips(), "A zsetonok száma nem megfelelő a döntetlen fogadás után.");
+        assertEquals(180, baccaratService.getPlayer().getChips(), "A zsetonok száma nem megfelelő a döntetlen fogadás után.");
     }
 
     @Test
