@@ -21,7 +21,6 @@ export class GameTableComponent implements OnInit, OnDestroy {
   constructor(private http: HttpClient, private gameService: GameService) { }
 
   ngOnDestroy() {
-    // Leiratkozás, hogy megakadályozzuk a memória szivárgásokat.
     this.subscriptions.unsubscribe();
   }
 
@@ -48,15 +47,40 @@ export class GameTableComponent implements OnInit, OnDestroy {
     });
   }
 
+  // getCards(): void {
+  //   this.http.get<{ playerCards: Card[], bankerCards: Card[] }>('http://localhost:8080/baccarat/cards')
+  //     .subscribe(response => {
+  // this.playerCards = response.playerCards;
+  // this.bankerCards = response.bankerCards;
+  //     }, error => {
+  //       console.error('There was an error retrieving the cards from the backend', error);
+  //     });
+  // }
+
   getCards(): void {
     this.http.get<{ playerCards: Card[], bankerCards: Card[] }>('http://localhost:8080/baccarat/cards')
       .subscribe(response => {
-        this.playerCards = response.playerCards;
-        this.bankerCards = response.bankerCards;
+        // Tisztítsuk meg a kártyatömböket
+        this.playerCards = [];
+        this.bankerCards = [];
+
+        // Kártyák hozzáadása egyesével az animációval
+        response.playerCards.concat(response.bankerCards).forEach((card, index) => {
+          setTimeout(() => {
+            // A játékos és bankár kártyáinak felváltva történő hozzáadása
+            if (index % 2 === 0) { // Páros indexű elemek: játékos kártyái
+              this.playerCards.push(card);
+            } else { // Páratlan indexű elemek: bankár kártyái
+              this.bankerCards.push(card);
+            }
+          }, index * 500); // Minden kártya hozzáadása fél másodpercenként
+        });
       }, error => {
         console.error('There was an error retrieving the cards from the backend', error);
       });
   }
+
+
 
   getCardImage(card: Card): string {
     if (!card || !card['value'] || !card.suit) {
