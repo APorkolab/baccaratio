@@ -1,0 +1,28 @@
+.player-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #fff; // A képen látható háttérszín
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+
+  .balance-info,
+  .bet-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .value {
+      font-size: 1.2em;
+      color: #333;
+    }
+  }
+}

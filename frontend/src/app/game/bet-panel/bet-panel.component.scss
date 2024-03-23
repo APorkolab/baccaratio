@@ -1,0 +1,75 @@
+.bet-panel {
+  background: #b5402e; // A képen látható háttérszín
+  display: flex;
+  align-items: center;
+  justify-content: space-around; // A zsetonok és gombok elrendezése
+  padding: 10px;
+  border-radius: 8px;
+
+  button {
+    background: #f0f0f0;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+      background: darken(#f0f0f0, 10%);
+    }
+  }
+
+  .chips {
+    display: flex;
+
+    .chip {
+      background: #f7f7f7;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      transition: background-color 0.3s ease;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &:hover {
+        background-color: darken(#f7f7f7, 10%);
+      }
+
+      &.selected {
+        border: 2px solid #444;
+      }
+    }
+  }
+
+  .bet-options {
+    display: flex;
+
+    .bet-option {
+      background: #fff;
+      margin: 0 5px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  .current-bet-amount {
+    color: #fff;
+    font-size: 1.2rem;
+    margin: 0 10px;
+  }
+}

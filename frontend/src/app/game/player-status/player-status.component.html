@@ -1,1 +1,10 @@
-<p>player-status works!</p>
+<div class="player-status">
+	<div class="balance-info">
+		<span class="label">Balance:</span>
+		<span class="value">{{ balance | currency:'USD':'symbol':'1.0-0' }}</span>
+	</div>
+	<div class="bet-info">
+		<span class="label">Total Bet:</span>
+		<span class="value">{{ totalBet | currency:'USD':'symbol':'1.0-0' }}</span>
+	</div>
+</div>

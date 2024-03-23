@@ -58,10 +58,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "baccaratio:build:production"
+              "buildTarget": "baccaratio:build:production"
             },
             "development": {
-              "browserTarget": "baccaratio:build:development"
+              "buildTarget": "baccaratio:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -69,7 +69,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "baccaratio:build"
+            "buildTarget": "baccaratio:build"
           }
         },
         "test": {
