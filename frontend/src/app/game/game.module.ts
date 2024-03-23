@@ -5,8 +5,6 @@ import { BetPanelComponent } from './bet-panel/bet-panel.component';
 import { BetHistoryComponent } from './bet-history/bet-history.component';
 import { PlayerStatusComponent } from './player-status/player-status.component';
 
-
-
 @NgModule({
   declarations: [
     GameTableComponent,
@@ -16,6 +14,12 @@ import { PlayerStatusComponent } from './player-status/player-status.component';
   ],
   imports: [
     CommonModule
+  ],
+  exports: [
+    GameTableComponent,
+    BetPanelComponent,
+    BetHistoryComponent,
+    PlayerStatusComponent
   ]
 })
 export class GameModule { }

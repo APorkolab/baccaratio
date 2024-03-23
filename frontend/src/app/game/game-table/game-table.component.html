@@ -1,1 +1,16 @@
-<p>game-table works!</p>
+<div class="game-table">
+	<app-player-status></app-player-status>
+	<div class="hand player-hand">
+		<div *ngFor="let card of playerCards" class="card">
+			{{ card.rank }}{{ card.suit }}
+		</div>
+	</div>
+	<div class="betting-area">
+		<app-bet-panel></app-bet-panel>
+	</div>
+	<div class="hand banker-hand">
+		<div *ngFor="let card of bankerCards" class="card">
+			{{ card.rank }}{{ card.suit }}
+		</div>
+	</div>
+</div>
