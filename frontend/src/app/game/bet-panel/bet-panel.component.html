@@ -1,14 +1,14 @@
 <div class="bet-panel">
 	<div class="chips">
-		<div *ngFor="let chip of chips" class="chip" (click)="selectChip(chip)">
+		<div *ngFor="let chip of chips" class="chip" (click)="selectChip(chip); addToBet()">
 			{{ chip.label }}
 		</div>
 	</div>
 	<div class="bet-options">
-		<div *ngFor="let option of betOptions" (click)="placeBet(option.type)">
+		<button class="btn btn-warning" *ngFor="let option of betOptions" (click)="placeBet(option.type)">
 			<span class="label">{{ option.label }}</span>
 			<span class="odds">{{ option.odds }}</span>
-		</div>
+		</button>
 	</div>
 	<div class="current-bet-amount">
 		Current Bet: {{ currentBetAmount }}

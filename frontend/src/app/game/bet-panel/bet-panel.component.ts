@@ -32,9 +32,9 @@ export class BetPanelComponent {
     { type: 'player', label: 'PLAYER', odds: '1:1' },
     { type: 'banker', label: 'BANKER', odds: '0.95:1' },
     { type: 'tie', label: 'TIE', odds: '8:1' },
-    { type: 'playerPair', label: 'PLAYER PAIR', odds: '11:1' },
-    { type: 'bankerPair', label: 'BANKER PAIR', odds: '11:1' },
-    { type: 'perfectPair', label: 'PERFECT PAIR', odds: '25:1' },
+    { type: 'pPair', label: 'PLAYER PAIR', odds: '11:1' },
+    { type: 'bPair', label: 'BANKER PAIR', odds: '11:1' },
+    { type: 'perfectPairOne', label: 'PERFECT PAIR', odds: '25:1' },
   ];
 
   selectedChip: Chip = this.chips[0];

@@ -3,6 +3,7 @@ package com.prokey.baccaratio.controller;
 import com.prokey.baccaratio.model.Card;
 import com.prokey.baccaratio.service.BaccaratService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -20,25 +21,26 @@ public class BaccaratController {
     public BaccaratController(BaccaratService baccaratService) {
         this.baccaratService = baccaratService;
     }
-
+    
     @PostMapping("/bet/{type}/{amount}")
-    public String placeBet(@PathVariable("type") String type, @PathVariable("amount") int amount) {
-        // Kibővítve az új fogadási típusokkal
+    public ResponseEntity<?> placeBet(@PathVariable("type") String type, @PathVariable("amount") int amount) {
+        // Extended with new betting types
         if (amount <= 0) {
-            return "A tét összegének pozitívnak kell lennie.";
+            return ResponseEntity.badRequest().body(Map.of("message", "The bet amount must be positive."));
         }
         if (!type.equals("player") && !type.equals("banker") && !type.equals("tie")
-               && !type.equals("perfectPairOne") && !type.equals("pPair")
+                && !type.equals("perfectPairOne") && !type.equals("pPair")
                 && !type.equals("eitherPair") && !type.equals("bPair")) {
-            return "Érvénytelen fogadási típus.";
+            return ResponseEntity.badRequest().body(Map.of("message", "Invalid bet type."));
         }
         boolean betPlaced = baccaratService.placeBet(type, amount);
         if (betPlaced) {
-            return String.format("Fogadás helyezve: %s, összeggel: %d", type, amount);
+            return ResponseEntity.ok(Map.of("message", String.format("Bet placed: %s, with amount: %d", type, amount)));
         } else {
-            return "Nem sikerült a fogadást elhelyezni. Ellenőrizd a rendelkezésre álló zsetonok számát.";
+            return ResponseEntity.badRequest().body(Map.of("message", "Failed to place bet. Check the available chips."));
         }
     }
+
 
     @GetMapping("/play")
     public String play() {
