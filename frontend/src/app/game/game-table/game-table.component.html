@@ -1,19 +1,19 @@
 <app-player-status></app-player-status>
 <div class="game-table">
+
 	<div class="hand player-hand">
 		<div *ngFor="let card of playerCards" class="card">
 			<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
-			<ng-template #backCard>
-				<img src="../../../assets/cards/back.png" alt="Card Back" class="card-image">
-			</ng-template>
 		</div>
 	</div>
+
 	<div class="betting-area">
 		<app-bet-panel></app-bet-panel>
 	</div>
+
 	<div class="hand banker-hand">
 		<div *ngFor="let card of bankerCards" class="card">
-			{{ card.rank }}{{ card.suit }}
+			<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
 		</div>
 	</div>
 </div>

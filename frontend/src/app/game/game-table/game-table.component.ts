@@ -1,24 +1,51 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Card } from '../../model/card';
 import { BetPanelComponent } from '../bet-panel/bet-panel.component';
 import { PlayerStatusComponent } from '../player-status/player-status.component';
+import { Subscription } from 'rxjs';
+import { GameService } from '../game.service';
 
 @Component({
   selector: 'app-game-table',
   templateUrl: './game-table.component.html',
   styleUrls: ['./game-table.component.scss']
 })
-export class GameTableComponent implements OnInit {
+export class GameTableComponent implements OnInit, OnDestroy {
   playerCards: Card[] = [];
   bankerCards: Card[] = [];
+  private subscriptions = new Subscription();
   @ViewChild(BetPanelComponent) betPanelComponent!: BetPanelComponent;
   @ViewChild(PlayerStatusComponent) playerStatusComponent!: PlayerStatusComponent;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private gameService: GameService) { }
+
+  ngOnDestroy() {
+    // Leiratkozás, hogy megakadályozzuk a memória szivárgásokat.
+    this.subscriptions.unsubscribe();
+  }
 
   ngOnInit() {
-    this.getCards();
+    this.subscriptions.add(this.gameService.playerCards$.subscribe(cards => {
+      this.playerCards = cards;
+    }));
+    this.subscriptions.add(this.gameService.bankerCards$.subscribe(cards => {
+      this.bankerCards = cards;
+    }));
+
+    if (this.betPanelComponent) {
+      this.betPanelComponent.betPlaced.subscribe(({ type, amount }) => {
+        console.log(`Fogadás megtörtént: ${type} összeggel: ${amount}`);
+        this.getCards();
+      });
+    }
+  }
+
+  ngAfterViewInit() {
+    this.betPanelComponent.betPlaced.subscribe(({ type, amount }) => {
+      console.log(`Fogadás megtörtént: ${type} összeggel: ${amount}`);
+      this.getCards();
+    });
   }
 
   getCards(): void {
@@ -46,13 +73,11 @@ export class GameTableComponent implements OnInit {
     } else if (value === 'j') {
       value = 'jack';
     } else if (value === '10') {
-      value = '10'; // Ez lehet, hogy szükségtelen, ha a "10" már jól érkezik
+      value = '10';
     }
 
     const suit = card.suit.toLowerCase();
-    let suitName = suit; // Ha a suit nevek megegyeznek az elérési úton használtakkal, nem szükséges a switch case
-
-    // Visszaadja a megfelelő képfájl elérési útját
+    let suitName = suit;
     return `../../../assets/cards/${value}_of_${suitName}.png`;
   }
 
