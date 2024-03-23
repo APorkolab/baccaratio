@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c1cadc25-8b83-4f3b-935c-cf02248279d7" name="Changes" comment="Adding card getter endpoint." />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="5" />
+    <option name="recentBranches">
+      <RecentBranches>
+        <option name="branchesForRepo">
+          <list>
+            <RecentBranchesForRepo>
+              <option name="branches">
+                <list>
+                  <RecentBranch>
+                    <option name="branchName" value="main" />
+                    <option name="lastUsedInstant" value="1711049916" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="master" />
+                    <option name="lastUsedInstant" value="1711049782" />
+                  </RecentBranch>
+                </list>
+              </option>
+              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
+            </RecentBranchesForRepo>
+          </list>
+        </option>
+      </RecentBranches>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="$PROJECT_DIR$/../../../../maven3.9.6" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="2e0dmcI4ybEF8gacjPV5qDYa4i2" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Problems",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "MavenSettings",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="Spring Boot.BaccaratioApplication">
+    <configuration name="BaccaratServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="baccaratio" />
+      <option name="PACKAGE_NAME" value="com.prokey.baccaratio.service" />
+      <option name="MAIN_CLASS_NAME" value="com.prokey.baccaratio.service.BaccaratServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BaccaratServiceTest.testNaturalTie" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="baccaratio" />
+      <option name="PACKAGE_NAME" value="com.prokey.baccaratio.service" />
+      <option name="MAIN_CLASS_NAME" value="com.prokey.baccaratio.service.BaccaratServiceTest" />
+      <option name="METHOD_NAME" value="testNaturalTie" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BaccaratServiceTest.testPayoutForTieBet" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="baccaratio" />
+      <option name="PACKAGE_NAME" value="com.prokey.baccaratio.service" />
+      <option name="MAIN_CLASS_NAME" value="com.prokey.baccaratio.service.BaccaratServiceTest" />
+      <option name="METHOD_NAME" value="testPayoutForTieBet" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BaccaratServiceTest.testPlayerWinWithNoThirdCard" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="baccaratio" />
+      <option name="PACKAGE_NAME" value="com.prokey.baccaratio.service" />
+      <option name="MAIN_CLASS_NAME" value="com.prokey.baccaratio.service.BaccaratServiceTest" />
+      <option name="METHOD_NAME" value="testPlayerWinWithNoThirdCard" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BaccaratServiceTest.testTieReturnsBet" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="baccaratio" />
+      <option name="PACKAGE_NAME" value="com.prokey.baccaratio.service" />
+      <option name="MAIN_CLASS_NAME" value="com.prokey.baccaratio.service.BaccaratServiceTest" />
+      <option name="METHOD_NAME" value="testTieReturnsBet" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BaccaratioApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="baccaratio" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.prokey.baccaratio.BaccaratioApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.BaccaratServiceTest.testNaturalTie" />
+        <item itemvalue="JUnit.BaccaratServiceTest" />
+        <item itemvalue="JUnit.BaccaratServiceTest.testPayoutForTieBet" />
+        <item itemvalue="JUnit.BaccaratServiceTest.testPlayerWinWithNoThirdCard" />
+        <item itemvalue="JUnit.BaccaratServiceTest.testTieReturnsBet" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c1cadc25-8b83-4f3b-935c-cf02248279d7" name="Changes" comment="" />
+      <created>1711045617584</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1711045617584</updated>
+      <workItem from="1711045620462" duration="23017000" />
+    </task>
+    <task id="LOCAL-00001" summary="First commit.">
+      <option name="closed" value="true" />
+      <created>1711045881377</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1711045881377</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Implemented baccarat rules and test cases.">
+      <option name="closed" value="true" />
+      <created>1711049336180</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1711049336180</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Adding controller endpoints.">
+      <option name="closed" value="true" />
+      <created>1711051171961</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1711051171961</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Bugfixing upon test cases.">
+      <option name="closed" value="true" />
+      <created>1711089918556</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1711089918556</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Proper implementation by test cases.">
+      <option name="closed" value="true" />
+      <created>1711111589254</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1711111589254</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Adding other bet forms.">
+      <option name="closed" value="true" />
+      <created>1711115912400</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1711115912400</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Adding card getter endpoint.">
+      <option name="closed" value="true" />
+      <created>1711132052988</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1711132052988</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="First commit." />
+    <MESSAGE value="Implemented baccarat rules and test cases." />
+    <MESSAGE value="Adding controller endpoints." />
+    <MESSAGE value="Bugfixing upon test cases." />
+    <MESSAGE value="Proper implementation by test cases." />
+    <MESSAGE value="Adding other bet forms." />
+    <MESSAGE value="Adding card getter endpoint." />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding card getter endpoint." />
+  </component>
+</project>
