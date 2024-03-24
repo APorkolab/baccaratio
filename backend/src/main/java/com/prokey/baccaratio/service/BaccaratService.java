@@ -187,9 +187,40 @@ public class BaccaratService {
     }
 
     private boolean shouldBankerDraw(int bankerTotal, int playerTotal, Card playerThirdCard) {
-        // Logic for deciding if the banker should draw a third card
-        // This method remains unchanged
-        return false; // Simplified for illustration
+        if (bankerTotal >= 7) {
+            // A bankár összpontszáma 7 vagy magasabb: nem húz további lapot.
+            return false;
+        } else if (bankerTotal >= 3 && bankerTotal <= 6) {
+            // Speciális szabályok érvényesek, ha a bankár összpontszáma 3 és 6 között van.
+            if (playerThirdCard == null) {
+                // Ha a játékos nem húzott harmadik lapot, a bankár akkor húz,
+                // ha az összértéke 5 vagy kevesebb.
+                return bankerTotal <= 5;
+            } else {
+                // A játékos húzott harmadik lapot, így a döntés a lap értékétől függ.
+                int playerThirdCardValue = playerThirdCard.getPoints();
+                switch (bankerTotal) {
+                    case 3:
+                        // A bankár húz, kivéve, ha a játékos harmadik lapja 8.
+                        return playerThirdCardValue != 8;
+                    case 4:
+                        // A bankár húz, ha a játékos harmadik lapja 2-7 között van.
+                        return playerThirdCardValue >= 2 && playerThirdCardValue <= 7;
+                    case 5:
+                        // A bankár húz, ha a játékos harmadik lapja 4-7 között van.
+                        return playerThirdCardValue >= 4 && playerThirdCardValue <= 7;
+                    case 6:
+                        // A bankár húz, ha a játékos harmadik lapja 6 vagy 7.
+                        return playerThirdCardValue == 6 || playerThirdCardValue == 7;
+                    default:
+                        // Minden más esetben a bankár nem húz.
+                        return false;
+                }
+            }
+        } else {
+            // Ha a bankár összpontszáma 0, 1, vagy 2, mindig húz egy lapot.
+            return true;
+        }
     }
 
     private int calculateTotal(Card... cards) {

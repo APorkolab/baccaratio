@@ -5,6 +5,8 @@ import { BetPanelComponent } from '../bet-panel/bet-panel.component';
 import { PlayerStatusComponent } from '../player-status/player-status.component';
 import { Subscription } from 'rxjs';
 import { GameService } from '../game.service';
+import { from } from 'rxjs';
+import { concatMap, delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-game-table',
@@ -47,16 +49,6 @@ export class GameTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  // getCards(): void {
-  //   this.http.get<{ playerCards: Card[], bankerCards: Card[] }>('http://localhost:8080/baccarat/cards')
-  //     .subscribe(response => {
-  // this.playerCards = response.playerCards;
-  // this.bankerCards = response.bankerCards;
-  //     }, error => {
-  //       console.error('There was an error retrieving the cards from the backend', error);
-  //     });
-  // }
-
   getCards(): void {
     this.http.get<{ playerCards: Card[], bankerCards: Card[] }>('http://localhost:8080/baccarat/cards')
       .subscribe(response => {
@@ -64,16 +56,21 @@ export class GameTableComponent implements OnInit, OnDestroy {
         this.playerCards = [];
         this.bankerCards = [];
 
-        // Kártyák hozzáadása egyesével az animációval
-        response.playerCards.concat(response.bankerCards).forEach((card, index) => {
-          setTimeout(() => {
-            // A játékos és bankár kártyáinak felváltva történő hozzáadása
-            if (index % 2 === 0) { // Páros indexű elemek: játékos kártyái
-              this.playerCards.push(card);
-            } else { // Páratlan indexű elemek: bankár kártyái
-              this.bankerCards.push(card);
-            }
-          }, index * 500); // Minden kártya hozzáadása fél másodpercenként
+        // Készítsünk egy kombinált és szekvenciálisan frissített listát
+        const combinedCards = response.playerCards
+          .map((card, i) => ({ card, type: 'player', index: i * 2 }))
+          .concat(response.bankerCards.map((card, i) => ({ card, type: 'banker', index: i * 2 + 1 })))
+          .sort((a, b) => a.index - b.index);
+
+        from(combinedCards).pipe(
+          concatMap(item => from([item]).pipe(delay(500)))
+        ).subscribe(item => {
+          // A játékos és bankár kártyáinak felváltva történő hozzáadása
+          if (item.type === 'player') {
+            this.playerCards.push(item.card);
+          } else {
+            this.bankerCards.push(item.card);
+          }
         });
       }, error => {
         console.error('There was an error retrieving the cards from the backend', error);
