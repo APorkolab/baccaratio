@@ -274,5 +274,14 @@ public class BaccaratService {
     public List<Card> getBankerCards() {
         return bankerCards;
     }
+
+    public boolean updateChips(int amount) {
+        // Implementáció, hogy frissítsük a játékos zsetonjainak számát
+        if (player != null) {
+            player.setChips(player.getChips() + amount);
+            return true;
+        }
+        return false;
+    }
 }
 

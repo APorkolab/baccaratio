@@ -74,10 +74,13 @@ export class BetPanelComponent {
         console.log('Bet response:', response);
 
         const playResponse = await firstValueFrom(this.gameService.playGame());
-        console.log('Play response:', playResponse);
+
+        setTimeout(() => {
+          alert(playResponse);
+        }, 8000);
 
         this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
-        this.currentBetAmount = 0; // Nullázzuk a tét összegét
+        this.currentBetAmount = 0;
       } catch (error) {
         console.error('Error during betting process:', error);
       }
@@ -86,10 +89,5 @@ export class BetPanelComponent {
     }
   }
 
-  // letsPlay(): void{
-  //   console.log('About to play game');
-  //   this.gameService.playGame();
-  //   console.log('About to get cards');
-  // }
 
 }

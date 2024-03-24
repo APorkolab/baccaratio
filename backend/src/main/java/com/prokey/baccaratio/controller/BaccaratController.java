@@ -1,6 +1,7 @@
 package com.prokey.baccaratio.controller;
 
 import com.prokey.baccaratio.model.Card;
+import com.prokey.baccaratio.model.Player;
 import com.prokey.baccaratio.service.BaccaratService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -62,4 +63,55 @@ public class BaccaratController {
                 baccaratService.getBetType(),
                 baccaratService.getChips());
     }
+
+    @GetMapping("/player")
+    public ResponseEntity<?> getPlayer() {
+        Player player = baccaratService.getPlayer();
+        if (player != null) {
+            return ResponseEntity.ok(player);
+        }
+        return ResponseEntity.badRequest().body(Map.of("message", "Player not found."));
+    }
+
+    @GetMapping("/player/chips")
+    public ResponseEntity<?> getPlayerChips() {
+        Player player = baccaratService.getPlayer();
+        if (player != null) {
+            return ResponseEntity.ok(Map.of("chips", player.getChips()));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "Player not found."));
+        }
+    }
+
+    @PostMapping("/player/chips")
+    public ResponseEntity<?> updateChips(@RequestBody Map<String, Integer> chipsUpdate) {
+        int amount = chipsUpdate.getOrDefault("amount", 0);
+        boolean updated = baccaratService.updateChips(amount);
+        if (updated) {
+            return ResponseEntity.ok(Map.of("message", "Chips updated successfully."));
+        }
+        return ResponseEntity.badRequest().body(Map.of("message", "Failed to update chips."));
+    }
+
+    @GetMapping("/player/name")
+    public ResponseEntity<?> getPlayerName() {
+        String name = baccaratService.getPlayer().getName();
+        if (name != null && !name.isEmpty()) {
+            return ResponseEntity.ok(Map.of("name", name));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "Player name is not set."));
+        }
+    }
+
+    @PutMapping("/player/name")
+    public ResponseEntity<?> setPlayerName(@RequestBody Map<String, String> requestBody) {
+        String name = requestBody.get("name");
+        if (name != null && !name.trim().isEmpty()) {
+            baccaratService.getPlayer().setName(name);
+            return ResponseEntity.ok(Map.of("message", "Player name updated successfully."));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "Invalid name."));
+        }
+    }
+
 }

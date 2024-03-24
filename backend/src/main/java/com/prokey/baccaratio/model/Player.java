@@ -9,6 +9,10 @@ public class Player {
         this.chips = chips;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

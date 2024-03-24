@@ -4,12 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c1cadc25-8b83-4f3b-935c-cf02248279d7" name="Changes" comment="Adding card getter endpoint.">
+    <list default="true" id="c1cadc25-8b83-4f3b-935c-cf02248279d7" name="Changes" comment="Implement shouldBankerDraw method, fix deck animation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/prokey/baccaratio/controller/BaccaratController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/prokey/baccaratio/controller/BaccaratController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/prokey/baccaratio/model/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/prokey/baccaratio/model/Player.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/prokey/baccaratio/service/BaccaratService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/prokey/baccaratio/service/BaccaratService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/game-table/game-table.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/game-table/game-table.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/game-table/game-table.component.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/game-table/game-table.component.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/game-table/game-table.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/game-table/game-table.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/prokey/baccaratio/service/BaccaratServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/prokey/baccaratio/service/BaccaratServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/bet-panel/bet-panel.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/bet-panel/bet-panel.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/game.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/game.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/player-status/player-status.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/player-status/player-status.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/player-status/player-status.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/player-status/player-status.component.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -176,7 +180,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711045617584</updated>
-      <workItem from="1711045620462" duration="33072000" />
+      <workItem from="1711045620462" duration="35681000" />
     </task>
     <task id="LOCAL-00001" summary="First commit.">
       <option name="closed" value="true" />
@@ -234,7 +238,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711132052988</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Implement shouldBankerDraw method, fix deck animation">
+      <option name="closed" value="true" />
+      <created>1711278508354</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1711278508354</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -259,6 +271,7 @@
     <MESSAGE value="Proper implementation by test cases." />
     <MESSAGE value="Adding other bet forms." />
     <MESSAGE value="Adding card getter endpoint." />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding card getter endpoint." />
+    <MESSAGE value="Implement shouldBankerDraw method, fix deck animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implement shouldBankerDraw method, fix deck animation" />
   </component>
 </project>
