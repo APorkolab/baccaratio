@@ -1,35 +1,83 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Card } from '../../model/card';
 import { BetPanelComponent } from '../bet-panel/bet-panel.component';
 import { PlayerStatusComponent } from '../player-status/player-status.component';
+import { Subscription } from 'rxjs';
+import { GameService } from '../game.service';
+import { from } from 'rxjs';
+import { concatMap, delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-game-table',
   templateUrl: './game-table.component.html',
   styleUrls: ['./game-table.component.scss']
 })
-export class GameTableComponent implements OnInit {
+export class GameTableComponent implements OnInit, OnDestroy {
   playerCards: Card[] = [];
   bankerCards: Card[] = [];
+  private subscriptions = new Subscription();
   @ViewChild(BetPanelComponent) betPanelComponent!: BetPanelComponent;
   @ViewChild(PlayerStatusComponent) playerStatusComponent!: PlayerStatusComponent;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private gameService: GameService) { }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
 
   ngOnInit() {
-    this.getCards();
+    this.subscriptions.add(this.gameService.playerCards$.subscribe(cards => {
+      this.playerCards = cards;
+    }));
+    this.subscriptions.add(this.gameService.bankerCards$.subscribe(cards => {
+      this.bankerCards = cards;
+    }));
+
+    if (this.betPanelComponent) {
+      this.betPanelComponent.betPlaced.subscribe(({ type, amount }) => {
+        console.log(`Fogadás megtörtént: ${type} összeggel: ${amount}`);
+        this.getCards();
+      });
+    }
+  }
+
+  ngAfterViewInit() {
+    this.betPanelComponent.betPlaced.subscribe(({ type, amount }) => {
+      console.log(`Fogadás megtörtént: ${type} összeggel: ${amount}`);
+      this.getCards();
+    });
   }
 
   getCards(): void {
     this.http.get<{ playerCards: Card[], bankerCards: Card[] }>('http://localhost:8080/baccarat/cards')
       .subscribe(response => {
-        this.playerCards = response.playerCards;
-        this.bankerCards = response.bankerCards;
+        // Tisztítsuk meg a kártyatömböket
+        this.playerCards = [];
+        this.bankerCards = [];
+
+        // Készítsünk egy kombinált és szekvenciálisan frissített listát
+        const combinedCards = response.playerCards
+          .map((card, i) => ({ card, type: 'player', index: i * 2 }))
+          .concat(response.bankerCards.map((card, i) => ({ card, type: 'banker', index: i * 2 + 1 })))
+          .sort((a, b) => a.index - b.index);
+
+        from(combinedCards).pipe(
+          concatMap(item => from([item]).pipe(delay(500)))
+        ).subscribe(item => {
+          // A játékos és bankár kártyáinak felváltva történő hozzáadása
+          if (item.type === 'player') {
+            this.playerCards.push(item.card);
+          } else {
+            this.bankerCards.push(item.card);
+          }
+        });
       }, error => {
         console.error('There was an error retrieving the cards from the backend', error);
       });
   }
+
+
 
   getCardImage(card: Card): string {
     if (!card || !card['value'] || !card.suit) {
@@ -46,13 +94,11 @@ export class GameTableComponent implements OnInit {
     } else if (value === 'j') {
       value = 'jack';
     } else if (value === '10') {
-      value = '10'; // Ez lehet, hogy szükségtelen, ha a "10" már jól érkezik
+      value = '10';
     }
 
     const suit = card.suit.toLowerCase();
-    let suitName = suit; // Ha a suit nevek megegyeznek az elérési úton használtakkal, nem szükséges a switch case
-
-    // Visszaadja a megfelelő képfájl elérési útját
+    let suitName = suit;
     return `../../../assets/cards/${value}_of_${suitName}.png`;
   }
 

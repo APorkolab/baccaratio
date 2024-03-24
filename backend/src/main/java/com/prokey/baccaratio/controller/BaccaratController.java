@@ -21,7 +21,7 @@ public class BaccaratController {
     public BaccaratController(BaccaratService baccaratService) {
         this.baccaratService = baccaratService;
     }
-    
+
     @PostMapping("/bet/{type}/{amount}")
     public ResponseEntity<?> placeBet(@PathVariable("type") String type, @PathVariable("amount") int amount) {
         // Extended with new betting types

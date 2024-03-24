@@ -1,17 +1,20 @@
+.hand-label {
+  font-size: 1.5rem;
+  text-align: center;
+  margin-top: 3rem;
+}
+
 .game-table {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  /* Egyenletesen elosztja az elemeket */
   background-color: #eedcb3;
   color: #000;
   height: 100vh;
   width: 100vw;
   padding-top: 20px;
-  /* Helyet biztosít a tetején lévő elemeknek */
   position: relative;
-  /* Az abszolút pozicionált gyermek elemek miatt */
 }
 
 .app-player-status {
@@ -29,38 +32,78 @@
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  /* A teljes szélesség kihasználása */
   z-index: 2;
 }
 
 .hand {
   display: flex;
-  justify-content: center;
+  align-items: center;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  bottom: 50%;
+  flex-wrap: nowrap;
+}
+
+.player-hand,
+.banker-hand {
+  justify-content: center;
+  /* Középre igazítás */
+  gap: 15px;
+  /* A kártyák közötti hely */
 }
 
 .player-hand {
-  margin-right: 50px;
-  /* Elválasztja a két kéz csoportot */
+  left: 10%;
+  /* Az asztal bal oldalától való távolság */
 }
 
 .banker-hand {
-  margin-left: 50px;
-  /* Elválasztja a két kéz csoportot */
+  right: 10%;
+  /* Az asztal jobb oldalától való távolság */
+}
+
+@keyframes slideInFromRight {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .card {
-  width: 80px;
-  height: 120px;
+  animation: slideInFromRight 0.5s ease-out;
+  width: 14rem;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  margin: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
   background: white;
   font-size: 1.5em;
+  position: relative;
+  /* A flexbox konténerhez viszonyított helyzet */
+}
+
+.card:nth-child(1) {
+  left: 0;
+  z-index: 3;
+}
+
+.card:nth-child(2) {
+  left: 100px;
+  /* Egyes kártyák közötti távolság */
+  z-index: 2;
+}
+
+.card:nth-child(3) {
+  z-index: 1;
+  transform: rotate(90deg);
+  /* Elforgatás */
+  left: 50%;
+  /* Középre helyezés */
+  transform: translateX(-50%) rotate(90deg);
+  /* Középre igazítás az X tengelyen és elforgatás */
 }

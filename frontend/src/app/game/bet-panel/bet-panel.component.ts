@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { GameService } from '../game.service';
+import { firstValueFrom } from 'rxjs';
 
 interface Chip {
   value: number;
@@ -65,20 +66,30 @@ export class BetPanelComponent {
     }
   }
 
-  placeBet(betType: string): void {
+
+  async placeBet(betType: string): Promise<void> {
     if (this.currentBetAmount > 0) {
-      this.gameService.placeBet(betType, this.currentBetAmount).subscribe({
-        next: (response) => {
-          console.log(response);
-          this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
-          this.currentBetAmount = 0; // Reset the current bet amount after placing the bet
-        },
-        error: (error) => {
-          console.error('Error placing bet:', error);
-        }
-      });
+      try {
+        const response = await firstValueFrom(this.gameService.placeBet(betType, this.currentBetAmount));
+        console.log('Bet response:', response);
+
+        const playResponse = await firstValueFrom(this.gameService.playGame());
+        console.log('Play response:', playResponse);
+
+        this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
+        this.currentBetAmount = 0; // Nullázzuk a tét összegét
+      } catch (error) {
+        console.error('Error during betting process:', error);
+      }
     } else {
       console.error('No bet amount selected');
     }
   }
+
+  // letsPlay(): void{
+  //   console.log('About to play game');
+  //   this.gameService.playGame();
+  //   console.log('About to get cards');
+  // }
+
 }
