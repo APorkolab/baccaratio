@@ -1,36 +1,51 @@
+/* Általános stílusok, amelyek minden eszközön alkalmazandók */
+body {
+  font-family: 'Playfair Display', serif;
+  color: #fff;
+  background-color: #121212;
+}
+
+.hand-label,
+.betting-area,
+.card {
+  font-family: 'Playfair Display', serif;
+}
+
 .hand-label {
-  font-size: 1.5rem;
+  font-size: 2rem;
+  font-weight: bold;
   text-align: center;
-  margin-top: 3rem;
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid #ffd700;
+  padding-bottom: 0.5rem;
+  display: block;
+  margin: 0 auto;
+}
+
+.hand-container {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
 .game-table {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-around;
-  background-color: #eedcb3;
+  justify-content: flex-start;
+  background-color: #121212;
   color: #000;
-  height: 100vh;
-  width: 100vw;
-  padding-top: 20px;
+  min-height: 100vh;
+  width: 100%;
+  padding-top: 10px;
   position: relative;
-}
-
-.app-player-status {
-  position: relative;
-  top: 0;
-  right: 0;
-  margin: 10px;
 }
 
 .betting-area {
   display: flex;
   justify-content: center;
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
   width: 100%;
   z-index: 2;
 }
@@ -38,27 +53,25 @@
 .hand {
   display: flex;
   align-items: center;
-  position: absolute;
-  bottom: 50%;
-  flex-wrap: nowrap;
-}
-
-.player-hand,
-.banker-hand {
   justify-content: center;
-  /* Középre igazítás */
-  gap: 15px;
-  /* A kártyák közötti hely */
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.player-hand {
-  left: 10%;
-  /* Az asztal bal oldalától való távolság */
-}
-
-.banker-hand {
-  right: 10%;
-  /* Az asztal jobb oldalától való távolság */
+.card {
+  animation: slideInFromRight 0.5s ease-out;
+  width: auto;
+  max-width: 14rem;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  font-size: 1rem;
+  position: relative;
 }
 
 @keyframes slideInFromRight {
@@ -73,37 +86,182 @@
   }
 }
 
-.card {
-  animation: slideInFromRight 0.5s ease-out;
-  width: 14rem;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: white;
-  font-size: 1.5em;
-  position: relative;
-  /* A flexbox konténerhez viszonyított helyzet */
+/* Médialekérdezések különböző képernyőméretekhez */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .game-table {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .player-hand,
+  .banker-hand {
+    position: static;
+    transform: none;
+    margin: 20px 0;
+  }
+
+  .card {
+    max-width: 14rem;
+    font-size: 1em;
+  }
+
+  img {
+    max-width: 14rem;
+  }
 }
 
-.card:nth-child(1) {
-  left: 0;
-  z-index: 3;
+@media (min-width: 1024px) and (max-width: 1380px) {
+  .game-table {
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .betting-area {
+    position: absolute;
+    top: 0%;
+    left: 20%;
+    transform: translateX(-50%);
+    margin: 30%;
+  }
+
+  .player-hand,
+  .banker-hand {
+    position: relative;
+    top: auto;
+    transform: none;
+  }
+
+  .player-hand {
+    left: 10%;
+  }
+
+  .banker-hand {
+    right: 10%;
+  }
+
+  .card {
+    max-width: 120px;
+    font-size: 1.1em;
+    animation: slideInFromRight 0.5s ease-out;
+    width: 14rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    font-size: 1.5em;
+    position: relative;
+
+    &:nth-child(1) {
+      left: 0;
+      z-index: 3;
+    }
+
+    &:nth-child(2) {
+      left: 100px;
+      z-index: 2;
+    }
+
+    &:nth-child(3) {
+      z-index: 1;
+      left: 50%;
+      transform-origin: center;
+      transform: translateX(-50%) rotateY(180deg);
+    }
+  }
 }
 
-.card:nth-child(2) {
-  left: 100px;
-  /* Egyes kártyák közötti távolság */
-  z-index: 2;
-}
+@media (min-width: 1381px) {
+  .game-table {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #121212;
+    color: #000;
+    min-height: 100vh;
+    width: 100%;
+    height: 50%;
+    padding-top: 10px;
+    position: relative;
+  }
 
-.card:nth-child(3) {
-  z-index: 1;
-  transform: rotate(90deg);
-  /* Elforgatás */
-  left: 50%;
-  /* Középre helyezés */
-  transform: translateX(-50%) rotate(90deg);
-  /* Középre igazítás az X tengelyen és elforgatás */
+  .app-player-status {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin: 10px;
+  }
+
+  .betting-area {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    z-index: 2;
+  }
+
+  .hand {
+    display: flex;
+    align-items: self-start;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 50%;
+  }
+
+  .player-hand,
+  .banker-hand {
+    justify-content: center;
+
+  }
+
+  @keyframes slideInFromRight {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .card {
+    animation: slideInFromRight 0.5s ease-out;
+    width: 14rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    font-size: 1.5em;
+    position: relative;
+    /* A flexbox konténerhez viszonyított helyzet */
+  }
+
+  .card:nth-child(1) {
+    left: -0.5rem;
+    z-index: 3;
+  }
+
+  .card:nth-child(2) {
+    left: 1rem;
+    /* Egyes kártyák közötti távolság */
+    z-index: 2;
+  }
+
+  .card:nth-child(3) {
+    z-index: 1;
+    transform: rotate(90deg);
+    /* Elforgatás */
+    left: 12rem;
+    // /* Középre helyezés */
+    transform: translateX(-50%) rotate(90deg);
+    /* Középre igazítás az X tengelyen és elforgatás */
+  }
 }

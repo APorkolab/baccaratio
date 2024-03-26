@@ -41,7 +41,6 @@ export class GameService {
     );
   }
 
-
   // Az utolsó játék eredményének lekérése
   getLastResult(): Observable<string> {
     return this.http.get<string>(`${this.apiUrl}/result`, { responseType: 'text' as 'json' });
@@ -79,8 +78,6 @@ export class GameService {
   updateBalance(newBalance: number): void {
     this.balanceSubject.next(newBalance);
   }
-
-  // game.service.ts
 
   updateBalanceOnServer(newBalance: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/player/chips`, { newBalance }).pipe(

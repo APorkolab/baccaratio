@@ -51,18 +51,18 @@ export class BetPanelComponent {
 
   addToBet(): void {
     this.currentBetAmount += this.selectedChip.value;
-    this.betHistory.push(this.selectedChip.value); // Hozzáadjuk a tétel előzményekhez
+    this.betHistory.push(this.selectedChip.value);
     this.currentBetAmountChanged.emit(this.currentBetAmount);
   }
 
   doubleBet(): void {
     this.currentBetAmount *= 2;
-    this.betHistory.push(this.currentBetAmount); // A duplázás is előzményként tárolódik
+    this.betHistory.push(this.currentBetAmount);
     this.currentBetAmountChanged.emit(this.currentBetAmount);
   }
 
   undoLastBet(): void {
-    const lastBet = this.betHistory.pop(); // Eltávolítjuk az utolsó tétet
+    const lastBet = this.betHistory.pop();
     if (lastBet) {
       this.currentBetAmount -= lastBet;
       this.currentBetAmountChanged.emit(this.currentBetAmount);
