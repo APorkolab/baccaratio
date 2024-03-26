@@ -6,17 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c1cadc25-8b83-4f3b-935c-cf02248279d7" name="Changes" comment="Implement shouldBankerDraw method, fix deck animation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/bet-panel/bet-panel.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/bet-panel/bet-panel.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/bet-panel/bet-panel.component.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/bet-panel/bet-panel.component.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/bet-panel/bet-panel.component.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/bet-panel/bet-panel.component.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/bet-panel/bet-panel.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/bet-panel/bet-panel.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/game-table/game-table.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/game-table/game-table.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/game-table/game-table.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/game-table/game-table.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/game.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/game.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/player-status/player-status.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/player-status/player-status.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/player-status/player-status.component.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/player-status/player-status.component.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/game/player-status/player-status.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/game/player-status/player-status.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/model/player.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/model/player.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +96,7 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Spring Boot.BaccaratioApplication">
+  <component name="RunManager" selected="JUnit.BaccaratServiceTest">
     <configuration name="BaccaratServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="baccaratio" />
       <option name="PACKAGE_NAME" value="com.prokey.baccaratio.service" />
@@ -167,8 +156,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.BaccaratServiceTest.testNaturalTie" />
         <item itemvalue="JUnit.BaccaratServiceTest" />
+        <item itemvalue="JUnit.BaccaratServiceTest.testNaturalTie" />
         <item itemvalue="JUnit.BaccaratServiceTest.testPayoutForTieBet" />
         <item itemvalue="JUnit.BaccaratServiceTest.testPlayerWinWithNoThirdCard" />
         <item itemvalue="JUnit.BaccaratServiceTest.testTieReturnsBet" />
@@ -183,7 +172,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711045617584</updated>
-      <workItem from="1711045620462" duration="37413000" />
+      <workItem from="1711045620462" duration="38666000" />
     </task>
     <task id="LOCAL-00001" summary="First commit.">
       <option name="closed" value="true" />
