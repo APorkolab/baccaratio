@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 import { Card } from '../model/card';
 
@@ -9,7 +10,7 @@ import { Card } from '../model/card';
   providedIn: 'root'
 })
 export class GameService {
-  private readonly apiUrl = 'http://localhost:8080/baccarat';
+  apiUrl: string = environment.apiUrl;
   private playerCardsSubject = new BehaviorSubject<Card[]>([]);
   private bankerCardsSubject = new BehaviorSubject<Card[]>([]);
   private balanceSubject = new BehaviorSubject<number>(1000);
