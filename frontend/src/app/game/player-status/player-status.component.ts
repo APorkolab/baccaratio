@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { GameService } from '../game.service';
+import { Player } from 'src/app/model/player';
 
 @Component({
   selector: 'app-player-status',
@@ -7,6 +8,8 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./player-status.component.scss']
 })
 export class PlayerStatusComponent implements OnInit {
+
+
   balance: number = 1000;
   totalBet: number = 50;
   playerName: string = 'Babiagorai Riparievich Metell';
@@ -14,17 +17,25 @@ export class PlayerStatusComponent implements OnInit {
   editingName = false;
   editingTotalBet = false;
   editingBalance = false;
+  currentBetAmount: number = 0;
 
-  constructor(private http: HttpClient) { }
+
+  constructor(private gameService: GameService) { }
 
   ngOnInit(): void {
     this.getPlayer();
     this.getPlayerName();
+    this.gameService.updateBalance(this.balance);
   }
 
+  updateCurrentBetAmount(amount: number): void {
+    this.currentBetAmount = amount;
+  }
+
+
   getPlayer() {
-    this.http.get<any>('/baccarat/player').subscribe({
-      next: (response) => {
+    this.gameService.getPlayer().subscribe({
+      next: (response: Player) => {
         this.balance = response.chips;
         this.playerName = response.name;
       },
@@ -33,18 +44,20 @@ export class PlayerStatusComponent implements OnInit {
   }
 
   updateChips(amount: number) {
-    this.http.post<any>('/baccarat/player/chips', { amount }).subscribe({
-      next: (response) => {
-        console.log(response.message);
-        this.balance += amount; // Feltételezve, hogy az összeg lehet negatív is (vesztés esetén)
+    this.gameService.updateChips(amount).subscribe({
+      next: (response: Player) => {
+        console.log(response);
+        this.balance += amount;
+        this.gameService.updateBalance(this.balance);
+
       },
       error: (error) => console.error('Error updating chips:', error)
     });
   }
 
   getPlayerName() {
-    this.http.get<any>('/baccarat/player/name').subscribe({
-      next: (response) => {
+    this.gameService.getPlayerName().subscribe({
+      next: (response: Player) => {
         this.playerName = response.name;
       },
       error: (error) => console.error('Error fetching player name:', error)
@@ -52,8 +65,8 @@ export class PlayerStatusComponent implements OnInit {
   }
 
   setPlayerName(name: string) {
-    this.http.put<any>('/baccarat/player/name', { name }).subscribe({
-      next: (response) => {
+    this.gameService.setPlayerName(name).subscribe({
+      next: (response: { message: string }) => {
         console.log(response.message);
         this.playerName = name;
       },
@@ -61,33 +74,36 @@ export class PlayerStatusComponent implements OnInit {
     });
   }
 
+
   updateTotalBet(betAmount: number) {
-    this.http.post<any>('/baccarat/player/bet', { amount: betAmount }).subscribe({
-      next: (response) => {
-        console.log(response.message);
+    this.gameService.updateTotalBet(betAmount).subscribe({
+      next: (response: Player) => {
+        console.log(response);
         this.totalBet = betAmount;
+        this.gameService.updateBalance(this.balance);
       },
       error: (error) => console.error('Error updating total bet:', error)
     });
   }
 
   getChips() {
-    this.http.get<any>('/baccarat/player/chips').subscribe({
-      next: (response) => {
+    this.gameService.getChips().subscribe({
+      next: (response: Player) => {
         this.balance = response.chips;
+        this.gameService.updateBalance(this.balance);
       },
       error: (error) => console.error('Error fetching chips:', error)
     });
   }
 
-
-  updateBalance(newBalance: number) {
-    this.http.post<any>('/baccarat/player/balance', { newBalance }).subscribe({
+  updateBalance(newBalance: number): void {
+    this.gameService.updateBalanceOnServer(newBalance).subscribe({
       next: (response) => {
-        console.log(response.message);
-        this.balance = newBalance; // Feltételezve, hogy a backend frissíti az egyenleget
+        console.log('Egyensúly frissítve: ', response.message);
       },
-      error: (error) => console.error('Error updating balance:', error)
+      error: (error) => {
+        console.error('Hiba az egyensúly frissítése közben: ', error);
+      }
     });
   }
 

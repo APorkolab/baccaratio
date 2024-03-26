@@ -9,7 +9,7 @@
 	</div>
 
 	<div class="betting-area">
-		<app-bet-panel></app-bet-panel>
+		<app-bet-panel (currentBetAmountChanged)="handleBetAmountChange($event)"></app-bet-panel>
 	</div>
 
 	<div class="hand-label">Banker</div>

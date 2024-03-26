@@ -1,6 +1,6 @@
+import { Card } from './../../model/card';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Card } from '../../model/card';
 import { BetPanelComponent } from '../bet-panel/bet-panel.component';
 import { PlayerStatusComponent } from '../player-status/player-status.component';
 import { Subscription } from 'rxjs';
@@ -14,6 +14,17 @@ import { concatMap, delay } from 'rxjs/operators';
   styleUrls: ['./game-table.component.scss']
 })
 export class GameTableComponent implements OnInit, OnDestroy {
+
+
+  // game-table.component.ts
+
+  handleBetAmountChange(amount: number): void {
+    if (this.playerStatusComponent) {
+      this.playerStatusComponent.updateCurrentBetAmount(amount);
+    }
+  }
+
+
   playerCards: Card[] = [];
   bankerCards: Card[] = [];
   private subscriptions = new Subscription();
@@ -27,10 +38,10 @@ export class GameTableComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.subscriptions.add(this.gameService.playerCards$.subscribe(cards => {
+    this.subscriptions.add(this.gameService.playerCards$.subscribe((cards: Card[]) => {
       this.playerCards = cards;
     }));
-    this.subscriptions.add(this.gameService.bankerCards$.subscribe(cards => {
+    this.subscriptions.add(this.gameService.bankerCards$.subscribe((cards: Card[]) => {
       this.bankerCards = cards;
     }));
 
@@ -76,8 +87,6 @@ export class GameTableComponent implements OnInit, OnDestroy {
         console.error('There was an error retrieving the cards from the backend', error);
       });
   }
-
-
 
   getCardImage(card: Card): string {
     if (!card || !card['value'] || !card.suit) {

@@ -8,12 +8,10 @@
 		<button *ngIf="editingName" (click)="editingName = false">Cancel</button>
 	</div>
 	<div>
-		<label>Total Bet:</label>
-		<span *ngIf="!editingTotalBet">{{ totalBet }}</span>
-		<input *ngIf="editingTotalBet" type="number" [(ngModel)]="totalBet">
-		<button *ngIf="!editingTotalBet" (click)="editingTotalBet = true">Edit</button>
-		<button *ngIf="editingTotalBet" (click)="updateTotalBet(totalBet); editingTotalBet = false">OK</button>
-		<button *ngIf="editingTotalBet" (click)="editingTotalBet = false">Cancel</button>
+		<label>Current Bet:</label>
+		<div class="current-bet-amount">
+			{{ currentBetAmount }}
+		</div>
 	</div>
 	<div>
 		<label>Balance:</label>
