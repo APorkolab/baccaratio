@@ -1,11 +1,11 @@
-# Használj egy hivatalos Java runtime alap képet
+# Use an official Java runtime image as the base
 FROM openjdk:17-jdk-slim
 
-# Add meg az alkalmazás portját, amit a konténernek ki kell tennie
+# Expose the application's port to the container
 EXPOSE 8080
 
-# Másold a war fájlt az alkalmazás gyökérkönyvtárába a konténerben
-COPY ./target/baccaratio-1.0.0.war app.war
+# Copy the .war file from the target directory into the container's application root
+COPY ./target/baccaratio-1.0.0.war /app.war
 
-# Futtasd az alkalmazást
+# Execute the application
 ENTRYPOINT ["java", "-jar", "/app.war"]
