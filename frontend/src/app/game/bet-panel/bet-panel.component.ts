@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { GameService } from '../game.service';
 import { firstValueFrom } from 'rxjs';
-
 interface Chip {
   value: number;
   label: string;
@@ -39,9 +38,10 @@ export class BetPanelComponent {
   ];
 
   selectedChip: Chip = this.chips[0];
+  @Output() currentBetAmountChanged: EventEmitter<number> = new EventEmitter();
   currentBetAmount: number = 0;
 
-  @Output() betPlaced: EventEmitter<{ type: string, amount: number }> = new EventEmitter();
+  @Output() betPlaced: EventEmitter<{ type: string; amount: number; }> = new EventEmitter();
 
   constructor(private gameService: GameService) { }
 
@@ -51,18 +51,21 @@ export class BetPanelComponent {
 
   addToBet(): void {
     this.currentBetAmount += this.selectedChip.value;
-    this.betHistory.push(this.selectedChip.value); // Hozzáadjuk a tétel előzményekhez
+    this.betHistory.push(this.selectedChip.value);
+    this.currentBetAmountChanged.emit(this.currentBetAmount);
   }
 
   doubleBet(): void {
     this.currentBetAmount *= 2;
-    this.betHistory.push(this.currentBetAmount); // A duplázás is előzményként tárolódik
+    this.betHistory.push(this.currentBetAmount);
+    this.currentBetAmountChanged.emit(this.currentBetAmount);
   }
 
   undoLastBet(): void {
-    const lastBet = this.betHistory.pop(); // Eltávolítjuk az utolsó tétet
+    const lastBet = this.betHistory.pop();
     if (lastBet) {
       this.currentBetAmount -= lastBet;
+      this.currentBetAmountChanged.emit(this.currentBetAmount);
     }
   }
 
@@ -74,10 +77,14 @@ export class BetPanelComponent {
         console.log('Bet response:', response);
 
         const playResponse = await firstValueFrom(this.gameService.playGame());
-        console.log('Play response:', playResponse);
+
+        setTimeout(() => {
+          alert(playResponse);
+        }, 5000);
 
         this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
-        this.currentBetAmount = 0; // Nullázzuk a tét összegét
+        this.currentBetAmount = 0;
+        this.currentBetAmountChanged.emit(this.currentBetAmount);
       } catch (error) {
         console.error('Error during betting process:', error);
       }
@@ -86,10 +93,5 @@ export class BetPanelComponent {
     }
   }
 
-  // letsPlay(): void{
-  //   console.log('About to play game');
-  //   this.gameService.playGame();
-  //   console.log('About to get cards');
-  // }
 
 }

@@ -1,75 +1,125 @@
+$background-blue: #03406A;
+$background-red: #8B0000;
+$background-green: #228B22;
+$light-gray: #CCC;
+$dark-gray: #333;
+$font-stack: 'Playfair Display',
+serif;
+$chip-colors: (#205f88, #F7E50F, #2A8FBD, #F72F2F, #2ABF5B);
+
 .bet-panel {
-  background: #b5402e; // A képen látható háttérszín
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  justify-content: space-around; // A zsetonok és gombok elrendezése
-  padding: 10px;
-  border-radius: 8px;
-
-  button {
-    background: #f0f0f0;
-    border: none;
-    padding: 10px 20px;
-    margin: 0 5px;
-    border-radius: 5px;
-    cursor: pointer;
-
-    &:hover {
-      background: darken(#f0f0f0, 10%);
-    }
-  }
+  font-family: $font-stack;
 
   .chips {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
 
     .chip {
-      background: #f7f7f7;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       display: flex;
-      justify-content: center;
       align-items: center;
-      margin-right: 10px;
+      justify-content: center;
+      margin: 5px;
+      color: $dark-gray;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-      transition: background-color 0.3s ease;
 
-      &:last-child {
-        margin-right: 0;
-      }
-
-      &:hover {
-        background-color: darken(#f7f7f7, 10%);
-      }
-
-      &.selected {
-        border: 2px solid #444;
+      @for $i from 1 through length($chip-colors) {
+        &:nth-child(#{$i}) {
+          background-color: nth($chip-colors, $i);
+        }
       }
     }
   }
 
   .bet-options {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-family: $font-stack;
 
-    .bet-option {
-      background: #fff;
-      margin: 0 5px;
-      padding: 8px 12px;
-      border-radius: 5px;
+
+    button {
+      margin: 0.5rem;
+      padding: 1rem 2rem;
+      border: none;
+      font-weight: bold;
       cursor: pointer;
-      transition: all 0.3s ease;
 
       &:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        opacity: 0.8;
+      }
+
+      &.btn-primary {
+        background-color: $background-blue;
+      }
+
+      &.btn-danger {
+        background-color: $background-red;
+      }
+
+      &.btn-success {
+        background-color: $background-green;
+      }
+
+      span.label {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      span.odds {
+        display: block;
+        font-size: smaller;
+        background: $light-gray;
+        color: $dark-gray;
+        padding: 2px 4px;
+        border-radius: 4px;
       }
     }
   }
 
-  .current-bet-amount {
-    color: #fff;
-    font-size: 1.2rem;
-    margin: 0 10px;
+  .bet-operations {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem;
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      border: none;
+      background-color: $dark-gray;
+      color: white;
+      cursor: pointer;
+      width: 80%; // Mobile responsive adjustment
+
+      &:hover {
+        background-color: lighten($dark-gray, 10%);
+      }
+    }
+  }
+}
+
+// Reszponzív stílusok
+@media (max-width: 768px) {
+  .bet-panel {
+    flex-direction: column;
+  }
+
+  .bet-options {
+    justify-content: space-around;
+
+    button {
+      width: 45%; // Allows for two buttons per row on smaller screens
+    }
   }
 }

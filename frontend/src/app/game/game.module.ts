@@ -4,6 +4,7 @@ import { GameTableComponent } from './game-table/game-table.component';
 import { BetPanelComponent } from './bet-panel/bet-panel.component';
 import { BetHistoryComponent } from './bet-history/bet-history.component';
 import { PlayerStatusComponent } from './player-status/player-status.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { PlayerStatusComponent } from './player-status/player-status.component';
     PlayerStatusComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    FormsModule
   ],
   exports: [
     GameTableComponent,

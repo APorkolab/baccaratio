@@ -1,21 +1,24 @@
 <app-player-status></app-player-status>
+<div class="betting-area">
+	<app-bet-panel (currentBetAmountChanged)="handleBetAmountChange($event)"></app-bet-panel>
+</div>
 <div class="game-table">
 
-	<div class="hand-label">Player</div>
-	<div class="hand player-hand">
-		<div *ngFor="let card of playerCards" class="card">
-			<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
+	<div class="hand-container">
+		<div class="hand-label">Player</div>
+		<div class="hand player-hand">
+			<div *ngFor="let card of playerCards" class="card">
+				<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
+			</div>
 		</div>
 	</div>
 
-	<div class="betting-area">
-		<app-bet-panel></app-bet-panel>
-	</div>
-
-	<div class="hand-label">Banker</div>
-	<div class="hand banker-hand">
-		<div *ngFor="let card of bankerCards" class="card">
-			<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
+	<div class="hand-container">
+		<div class="hand-label">Banker</div>
+		<div class="hand banker-hand">
+			<div *ngFor="let card of bankerCards" class="card">
+				<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
+			</div>
 		</div>
 	</div>
 </div>
