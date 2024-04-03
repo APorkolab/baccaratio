@@ -1,4 +1,4 @@
 export const environment = {
-	production: false,
-	apiUrl: 'https://baccaratio.appspot.com/baccarat',
+	production: true,
+	apiUrl: 'https://baccaratio-wandering-sun-796.fly.dev/baccarat',
 };
