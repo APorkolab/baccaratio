@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { GameService } from '../game.service';
 import { from } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-game-table',
@@ -14,9 +15,7 @@ import { concatMap, delay } from 'rxjs/operators';
   styleUrls: ['./game-table.component.scss']
 })
 export class GameTableComponent implements OnInit, OnDestroy {
-
-
-  // game-table.component.ts
+  apiUrl: string = environment.apiUrl;
 
   handleBetAmountChange(amount: number): void {
     if (this.playerStatusComponent) {
@@ -61,7 +60,7 @@ export class GameTableComponent implements OnInit, OnDestroy {
   }
 
   getCards(): void {
-    this.http.get<{ playerCards: Card[], bankerCards: Card[] }>('http://localhost:8080/baccarat/cards')
+    this.http.get<{ playerCards: Card[], bankerCards: Card[] }>(`${this.apiUrl}/cards`)
       .subscribe(response => {
         // Tisztítsuk meg a kártyatömböket
         this.playerCards = [];
