@@ -1,11 +1,10 @@
 .player-status {
-  font-family: 'Playfair Display',
-    serif;
+  font-family: "Playfair Display", serif;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background: #fff; // A képen látható háttérszín
+  background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -28,9 +27,3 @@
     }
   }
 }
-
-// .current-bet-amount {
-//   color: #fff;
-//   font-size: 1.2rem;
-//   margin: 0 10px;
-// }

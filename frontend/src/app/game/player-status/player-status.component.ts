@@ -5,11 +5,9 @@ import { Player } from 'src/app/model/player';
 @Component({
   selector: 'app-player-status',
   templateUrl: './player-status.component.html',
-  styleUrls: ['./player-status.component.scss']
+  styleUrls: ['./player-status.component.scss'],
 })
 export class PlayerStatusComponent implements OnInit {
-
-
   balance: number = 1000;
   totalBet: number = 50;
   playerName: string = 'Babiagorai Riparievich Metell';
@@ -18,7 +16,6 @@ export class PlayerStatusComponent implements OnInit {
   editingTotalBet = false;
   editingBalance = false;
   currentBetAmount: number = 0;
-
 
   constructor(private gameService: GameService) { }
 
@@ -32,14 +29,13 @@ export class PlayerStatusComponent implements OnInit {
     this.currentBetAmount = amount;
   }
 
-
   getPlayer() {
     this.gameService.getPlayer().subscribe({
       next: (response: Player) => {
         this.balance = response.chips;
         this.playerName = response.name;
       },
-      error: (error) => console.error('Error fetching player:', error)
+      error: (error) => console.error('Error fetching player:', error),
     });
   }
 
@@ -49,9 +45,8 @@ export class PlayerStatusComponent implements OnInit {
         console.log(response);
         this.balance += amount;
         this.gameService.updateBalance(this.balance);
-
       },
-      error: (error) => console.error('Error updating chips:', error)
+      error: (error) => console.error('Error updating chips:', error),
     });
   }
 
@@ -60,7 +55,7 @@ export class PlayerStatusComponent implements OnInit {
       next: (response: Player) => {
         this.playerName = response.name;
       },
-      error: (error) => console.error('Error fetching player name:', error)
+      error: (error) => console.error('Error fetching player name:', error),
     });
   }
 
@@ -70,10 +65,9 @@ export class PlayerStatusComponent implements OnInit {
         console.log(response.message);
         this.playerName = name;
       },
-      error: (error) => console.error('Error setting player name:', error)
+      error: (error) => console.error('Error setting player name:', error),
     });
   }
-
 
   updateTotalBet(betAmount: number) {
     this.gameService.updateTotalBet(betAmount).subscribe({
@@ -82,7 +76,7 @@ export class PlayerStatusComponent implements OnInit {
         this.totalBet = betAmount;
         this.gameService.updateBalance(this.balance);
       },
-      error: (error) => console.error('Error updating total bet:', error)
+      error: (error) => console.error('Error updating total bet:', error),
     });
   }
 
@@ -92,7 +86,7 @@ export class PlayerStatusComponent implements OnInit {
         this.balance = response.chips;
         this.gameService.updateBalance(this.balance);
       },
-      error: (error) => console.error('Error fetching chips:', error)
+      error: (error) => console.error('Error fetching chips:', error),
     });
   }
 
@@ -103,8 +97,7 @@ export class PlayerStatusComponent implements OnInit {
       },
       error: (error) => {
         console.error('Hiba az egyensúly frissítése közben: ', error);
-      }
+      },
     });
   }
-
 }

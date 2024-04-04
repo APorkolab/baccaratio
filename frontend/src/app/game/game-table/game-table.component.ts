@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-game-table',
   templateUrl: './game-table.component.html',
-  styleUrls: ['./game-table.component.scss']
+  styleUrls: ['./game-table.component.scss'],
 })
 export class GameTableComponent implements OnInit, OnDestroy {
   apiUrl: string = environment.apiUrl;
@@ -23,12 +23,12 @@ export class GameTableComponent implements OnInit, OnDestroy {
     }
   }
 
-
   playerCards: Card[] = [];
   bankerCards: Card[] = [];
   private subscriptions = new Subscription();
   @ViewChild(BetPanelComponent) betPanelComponent!: BetPanelComponent;
-  @ViewChild(PlayerStatusComponent) playerStatusComponent!: PlayerStatusComponent;
+  @ViewChild(PlayerStatusComponent)
+  playerStatusComponent!: PlayerStatusComponent;
 
   constructor(private http: HttpClient, private gameService: GameService) { }
 
@@ -37,12 +37,16 @@ export class GameTableComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.subscriptions.add(this.gameService.playerCards$.subscribe((cards: Card[]) => {
-      this.playerCards = cards;
-    }));
-    this.subscriptions.add(this.gameService.bankerCards$.subscribe((cards: Card[]) => {
-      this.bankerCards = cards;
-    }));
+    this.subscriptions.add(
+      this.gameService.playerCards$.subscribe((cards: Card[]) => {
+        this.playerCards = cards;
+      })
+    );
+    this.subscriptions.add(
+      this.gameService.bankerCards$.subscribe((cards: Card[]) => {
+        this.bankerCards = cards;
+      })
+    );
 
     if (this.betPanelComponent) {
       this.betPanelComponent.betPlaced.subscribe(({ type, amount }) => {
@@ -60,31 +64,41 @@ export class GameTableComponent implements OnInit, OnDestroy {
   }
 
   getCards(): void {
-    this.http.get<{ playerCards: Card[], bankerCards: Card[] }>(`${this.apiUrl}/cards`)
-      .subscribe(response => {
-        // Tisztítsuk meg a kártyatömböket
-        this.playerCards = [];
-        this.bankerCards = [];
+    this.http
+      .get<{ playerCards: Card[]; bankerCards: Card[] }>(`${this.apiUrl}/cards`)
+      .subscribe(
+        (response) => {
+          this.playerCards = [];
+          this.bankerCards = [];
 
-        // Készítsünk egy kombinált és szekvenciálisan frissített listát
-        const combinedCards = response.playerCards
-          .map((card, i) => ({ card, type: 'player', index: i * 2 }))
-          .concat(response.bankerCards.map((card, i) => ({ card, type: 'banker', index: i * 2 + 1 })))
-          .sort((a, b) => a.index - b.index);
+          const combinedCards = response.playerCards
+            .map((card, i) => ({ card, type: 'player', index: i * 2 }))
+            .concat(
+              response.bankerCards.map((card, i) => ({
+                card,
+                type: 'banker',
+                index: i * 2 + 1,
+              }))
+            )
+            .sort((a, b) => a.index - b.index);
 
-        from(combinedCards).pipe(
-          concatMap(item => from([item]).pipe(delay(500)))
-        ).subscribe(item => {
-          // A játékos és bankár kártyáinak felváltva történő hozzáadása
-          if (item.type === 'player') {
-            this.playerCards.push(item.card);
-          } else {
-            this.bankerCards.push(item.card);
-          }
-        });
-      }, error => {
-        console.error('There was an error retrieving the cards from the backend', error);
-      });
+          from(combinedCards)
+            .pipe(concatMap((item) => from([item]).pipe(delay(500))))
+            .subscribe((item) => {
+              if (item.type === 'player') {
+                this.playerCards.push(item.card);
+              } else {
+                this.bankerCards.push(item.card);
+              }
+            });
+        },
+        (error) => {
+          console.error(
+            'There was an error retrieving the cards from the backend',
+            error
+          );
+        }
+      );
   }
 
   getCardImage(card: Card): string {
@@ -109,5 +123,4 @@ export class GameTableComponent implements OnInit, OnDestroy {
     let suitName = suit;
     return `../../../assets/cards/${value}_of_${suitName}.png`;
   }
-
 }
