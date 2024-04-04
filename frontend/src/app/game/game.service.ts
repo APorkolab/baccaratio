@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
 import { Card } from '../model/card';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GameService {
   apiUrl: string = environment.apiUrl;
@@ -28,33 +28,38 @@ export class GameService {
 
   // Egy játék lejátszása
   playGame(): Observable<string> {
-    return this.http.get<string>(`${this.apiUrl}/play`, { responseType: 'text' as 'json' });
+    return this.http.get<string>(`${this.apiUrl}/play`, {
+      responseType: 'text' as 'json',
+    });
   }
 
   // A játékos és bankár kártyáinak lekérése
-  getCards(): Observable<{ playerCards: Card[], bankerCards: Card[] }> {
-    return this.http.get<{ player: Card[], banker: Card[] }>(`${this.apiUrl}/cards`).pipe(
-      tap(response => console.log('Backend response:', response)),
-      map(response => ({
-        playerCards: response.player,
-        bankerCards: response.banker
-      }))
-    );
+  getCards(): Observable<{ playerCards: Card[]; bankerCards: Card[] }> {
+    return this.http
+      .get<{ player: Card[]; banker: Card[] }>(`${this.apiUrl}/cards`)
+      .pipe(
+        tap((response) => console.log('Backend response:', response)),
+        map((response) => ({
+          playerCards: response.player,
+          bankerCards: response.banker,
+        }))
+      );
   }
 
   // Az utolsó játék eredményének lekérése
   getLastResult(): Observable<string> {
-    return this.http.get<string>(`${this.apiUrl}/result`, { responseType: 'text' as 'json' });
+    return this.http.get<string>(`${this.apiUrl}/result`, {
+      responseType: 'text' as 'json',
+    });
   }
 
   getPlayer(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/player`).pipe(
-      tap(response => {
+      tap((response) => {
         this.updateBalance(response.chips);
       })
     );
   }
-
 
   updateChips(amount: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/player/chips`, { amount });
@@ -65,11 +70,15 @@ export class GameService {
   }
 
   setPlayerName(name: string): Observable<{ message: string }> {
-    return this.http.put<{ message: string }>(`${this.apiUrl}/player/name`, { name });
+    return this.http.put<{ message: string }>(`${this.apiUrl}/player/name`, {
+      name,
+    });
   }
 
   updateTotalBet(betAmount: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/player/bet`, { amount: betAmount });
+    return this.http.post<any>(`${this.apiUrl}/player/bet`, {
+      amount: betAmount,
+    });
   }
 
   getChips(): Observable<any> {
@@ -81,17 +90,18 @@ export class GameService {
   }
 
   updateBalanceOnServer(newBalance: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/player/chips`, { newBalance }).pipe(
-      tap({
-        next: (response) => {
-          console.log(response.message);
-          this.updateBalance(newBalance);
-        },
-        error: (error) => {
-          console.error('Error updating balance:', error);
-        }
-      })
-    );
+    return this.http
+      .post<any>(`${this.apiUrl}/player/chips`, { newBalance })
+      .pipe(
+        tap({
+          next: (response) => {
+            console.log(response.message);
+            this.updateBalance(newBalance);
+          },
+          error: (error) => {
+            console.error('Error updating balance:', error);
+          },
+        })
+      );
   }
-
 }

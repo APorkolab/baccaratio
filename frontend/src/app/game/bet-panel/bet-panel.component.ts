@@ -5,17 +5,15 @@ interface Chip {
   value: number;
   label: string;
 }
-
 interface BetOption {
   type: string;
   label: string;
   odds: string;
 }
-
 @Component({
   selector: 'app-bet-panel',
   templateUrl: './bet-panel.component.html',
-  styleUrls: ['./bet-panel.component.scss']
+  styleUrls: ['./bet-panel.component.scss'],
 })
 export class BetPanelComponent {
   chips: Chip[] = [
@@ -24,7 +22,7 @@ export class BetPanelComponent {
     { value: 25, label: '25' },
     { value: 100, label: '100' },
     { value: 500, label: '500' },
-    { value: 2500, label: '2500' }
+    { value: 2500, label: '2500' },
   ];
   betHistory: number[] = [];
 
@@ -41,7 +39,8 @@ export class BetPanelComponent {
   @Output() currentBetAmountChanged: EventEmitter<number> = new EventEmitter();
   currentBetAmount: number = 0;
 
-  @Output() betPlaced: EventEmitter<{ type: string; amount: number; }> = new EventEmitter();
+  @Output() betPlaced: EventEmitter<{ type: string; amount: number }> =
+    new EventEmitter();
 
   constructor(private gameService: GameService) { }
 
@@ -69,11 +68,12 @@ export class BetPanelComponent {
     }
   }
 
-
   async placeBet(betType: string): Promise<void> {
     if (this.currentBetAmount > 0) {
       try {
-        const response = await firstValueFrom(this.gameService.placeBet(betType, this.currentBetAmount));
+        const response = await firstValueFrom(
+          this.gameService.placeBet(betType, this.currentBetAmount)
+        );
         console.log('Bet response:', response);
 
         const playResponse = await firstValueFrom(this.gameService.playGame());
@@ -92,6 +92,4 @@ export class BetPanelComponent {
       console.error('No bet amount selected');
     }
   }
-
-
 }

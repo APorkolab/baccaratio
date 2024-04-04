@@ -1,11 +1,11 @@
-$background-blue: #03406A;
-$background-red: #8B0000;
-$background-green: #228B22;
-$light-gray: #CCC;
+$background-blue: #03406a;
+$background-red: #8b0000;
+$background-green: #228b22;
+$light-gray: #ccc;
 $dark-gray: #333;
-$font-stack: 'Playfair Display',
+$font-stack: "Playfair Display",
 serif;
-$chip-colors: (#205f88, #F7E50F, #2A8FBD, #F72F2F, #2ABF5B);
+$chip-colors: (#205f88, #f7e50f, #2a8fbd, #f72f2f, #2abf5b);
 
 .bet-panel {
   display: flex;
@@ -45,7 +45,6 @@ $chip-colors: (#205f88, #F7E50F, #2A8FBD, #F72F2F, #2ABF5B);
     flex-wrap: wrap;
     justify-content: center;
     font-family: $font-stack;
-
 
     button {
       margin: 0.5rem;
@@ -100,7 +99,7 @@ $chip-colors: (#205f88, #F7E50F, #2A8FBD, #F72F2F, #2ABF5B);
       background-color: $dark-gray;
       color: white;
       cursor: pointer;
-      width: 80%; // Mobile responsive adjustment
+      width: 80%;
 
       &:hover {
         background-color: lighten($dark-gray, 10%);
@@ -109,7 +108,6 @@ $chip-colors: (#205f88, #F7E50F, #2A8FBD, #F72F2F, #2ABF5B);
   }
 }
 
-// Reszponzív stílusok
 @media (max-width: 768px) {
   .bet-panel {
     flex-direction: column;
@@ -119,7 +117,7 @@ $chip-colors: (#205f88, #F7E50F, #2A8FBD, #F72F2F, #2ABF5B);
     justify-content: space-around;
 
     button {
-      width: 45%; // Allows for two buttons per row on smaller screens
+      width: 45%;
     }
   }
 }

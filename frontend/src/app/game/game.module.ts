@@ -11,17 +11,14 @@ import { FormsModule } from '@angular/forms';
     GameTableComponent,
     BetPanelComponent,
     BetHistoryComponent,
-    PlayerStatusComponent
+    PlayerStatusComponent,
   ],
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
+  imports: [CommonModule, FormsModule],
   exports: [
     GameTableComponent,
     BetPanelComponent,
     BetHistoryComponent,
-    PlayerStatusComponent
-  ]
+    PlayerStatusComponent,
+  ],
 })
 export class GameModule { }
