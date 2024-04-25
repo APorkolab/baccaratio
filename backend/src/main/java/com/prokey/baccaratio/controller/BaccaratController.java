@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-@RequestMapping("/baccarat")
 public class BaccaratController {
 
     private final BaccaratService baccaratService;
@@ -21,6 +20,11 @@ public class BaccaratController {
     @Autowired
     public BaccaratController(BaccaratService baccaratService) {
         this.baccaratService = baccaratService;
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<?> welcome() {
+        return ResponseEntity.ok(Map.of("message", "Welcome to the Baccarat Game API!"));
     }
 
     @PostMapping("/bet/{type}/{amount}")
