@@ -1,0 +1,14 @@
+# Use an official Java runtime image as the base
+FROM openjdk:17-jdk-slim
+
+# Expose the application's port to the container
+EXPOSE 8080
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the .jar file from the target directory (relative to the Docker build context) into the container's application directory
+COPY ../backend/target/baccaratio-1.0.0.jar /app/app.jar
+
+# Execute the application
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

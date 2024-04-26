@@ -1,0 +1,31 @@
+version: '3.6'
+services:
+  web:
+    build:
+      context: Dockerfile_java_app
+      dockerfile: Dockerfile_java_app  # Az alkalmazásod Dockerfile-ja
+    container_name: ${COMPOSE_PROJECT_NAME}_web
+    working_dir: /app
+    restart: always
+    volumes:
+      - ./:/app
+    expose:
+      - "8080"  # A Java alkalmazás által használt port
+    networks:
+      - default
+      - nginx_reverse_proxy
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${VIRTUAL_HOST}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    logging:
+      driver: json-file
+      options:
+        max-size: '1m'
+        max-file: '3'
+
+networks:
+  nginx_reverse_proxy:
+    external: true
+  default:
+    external: false

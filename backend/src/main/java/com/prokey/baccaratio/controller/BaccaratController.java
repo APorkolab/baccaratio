@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
 public class BaccaratController {
+
+    private static final Set<String> VALID_BET_TYPES = Set.of("player", "banker", "tie", "perfectPairOne", "pPair", "eitherPair", "bPair");
 
     private final BaccaratService baccaratService;
 
@@ -22,20 +24,17 @@ public class BaccaratController {
         this.baccaratService = baccaratService;
     }
 
-    @GetMapping("/")
-    public ResponseEntity<?> welcome() {
-        return ResponseEntity.ok(Map.of("message", "Welcome to the Baccarat Game API!"));
+    @GetMapping("/hello")
+    public String welcome() {
+        return "Welcome to the Baccarat Game API!";
     }
 
     @PostMapping("/bet/{type}/{amount}")
     public ResponseEntity<?> placeBet(@PathVariable("type") String type, @PathVariable("amount") int amount) {
-        // Extended with new betting types
         if (amount <= 0) {
             return ResponseEntity.badRequest().body(Map.of("message", "The bet amount must be positive."));
         }
-        if (!type.equals("player") && !type.equals("banker") && !type.equals("tie")
-                && !type.equals("perfectPairOne") && !type.equals("pPair")
-                && !type.equals("eitherPair") && !type.equals("bPair")) {
+        if (!VALID_BET_TYPES.contains(type)) {
             return ResponseEntity.badRequest().body(Map.of("message", "Invalid bet type."));
         }
         boolean betPlaced = baccaratService.placeBet(type, amount);
@@ -45,7 +44,6 @@ public class BaccaratController {
             return ResponseEntity.badRequest().body(Map.of("message", "Failed to place bet. Check the available chips."));
         }
     }
-
 
     @GetMapping("/play")
     public String play() {
@@ -99,9 +97,9 @@ public class BaccaratController {
 
     @GetMapping("/player/name")
     public ResponseEntity<?> getPlayerName() {
-        String name = baccaratService.getPlayer().getName();
-        if (name != null && !name.isEmpty()) {
-            return ResponseEntity.ok(Map.of("name", name));
+        Player player = baccaratService.getPlayer();
+        if (player != null && player.getName() != null && !player.getName().isEmpty()) {
+            return ResponseEntity.ok(Map.of("name", player.getName()));
         } else {
             return ResponseEntity.badRequest().body(Map.of("message", "Player name is not set."));
         }
@@ -110,11 +108,12 @@ public class BaccaratController {
     @PutMapping("/player/name")
     public ResponseEntity<?> setPlayerName(@RequestBody Map<String, String> requestBody) {
         String name = requestBody.get("name");
-        if (name != null && !name.trim().isEmpty()) {
-            baccaratService.getPlayer().setName(name);
+        Player player = baccaratService.getPlayer();
+        if (player != null && name != null && !name.trim().isEmpty()) {
+            player.setName(name);
             return ResponseEntity.ok(Map.of("message", "Player name updated successfully."));
         } else {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid name."));
+            return ResponseEntity.badRequest().body(Map.of("message", "Invalid name or player not found."));
         }
     }
 
