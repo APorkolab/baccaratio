@@ -1,4 +1,4 @@
 export const environment = {
 	production: true,
-	apiUrl: 'https://www.baccaratio.devma.de/',
+	apiUrl: 'https://nerdnest.devma.de/baccaratio',
 };
