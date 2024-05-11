@@ -30,8 +30,9 @@ export class BetPanelComponent {
     { type: 'player', label: 'PLAYER', odds: '1:1' },
     { type: 'banker', label: 'BANKER', odds: '0.95:1' },
     { type: 'tie', label: 'TIE', odds: '8:1' },
-    { type: 'pPair', label: 'PLAYER PAIR', odds: '11:1' },
-    { type: 'bPair', label: 'BANKER PAIR', odds: '11:1' },
+    { type: 'playerPair', label: 'PLAYER PAIR', odds: '11:1' },
+    { type: 'bankerPair', label: 'BANKER PAIR', odds: '11:1' },
+    { type: 'eitherPair', label: 'EITHER PAIR', odds: '5:1' },
     { type: 'perfectPairOne', label: 'PERFECT PAIR', odds: '25:1' },
   ];
 
@@ -42,6 +43,7 @@ export class BetPanelComponent {
   @Output() betPlaced: EventEmitter<{ type: string; amount: number }> =
     new EventEmitter();
 
+  loading: boolean = false;
   constructor(private gameService: GameService) { }
 
   selectChip(chip: Chip): void {
@@ -69,27 +71,41 @@ export class BetPanelComponent {
   }
 
   async placeBet(betType: string): Promise<void> {
-    if (this.currentBetAmount > 0) {
-      try {
-        const response = await firstValueFrom(
-          this.gameService.placeBet(betType, this.currentBetAmount)
-        );
-        console.log('Bet response:', response);
-
-        const playResponse = await firstValueFrom(this.gameService.playGame());
-
-        setTimeout(() => {
-          alert(playResponse);
-        }, 5000);
-
-        this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
-        this.currentBetAmount = 0;
-        this.currentBetAmountChanged.emit(this.currentBetAmount);
-      } catch (error) {
-        console.error('Error during betting process:', error);
-      }
-    } else {
+    if (this.currentBetAmount <= 0) {
       console.error('No bet amount selected');
+      alert('Please select a bet amount before placing a bet.');
+      return;
+    }
+
+    this.loading = true;
+    try {
+      const response = await firstValueFrom(
+        this.gameService.placeBet(betType, this.currentBetAmount)
+
+      );
+      setTimeout(() => {
+        alert(playResponse);
+      }, 5000);
+
+      const playResponse = await firstValueFrom(this.gameService.playGame());
+
+      this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
+      this.currentBetAmount = 0;
+      this.currentBetAmountChanged.emit(this.currentBetAmount);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("You have no remaining chips or you do not have enough chips for this bet.");
+      }
+    } finally {
+      this.loading = false;
     }
   }
+
+
+
+
+
+
 }

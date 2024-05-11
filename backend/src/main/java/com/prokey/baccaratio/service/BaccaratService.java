@@ -23,7 +23,7 @@ public class BaccaratService {
     @Autowired
     public BaccaratService(Deck deck) {
         this.deck = deck;
-        this.player = new Player("Default Player", 100);
+        this.player = new Player("Babiagorai Riparievich Metell", 1000);
     }
 
     public Player getPlayer() {
@@ -35,13 +35,11 @@ public class BaccaratService {
     }
 
     public boolean placeBet(String type, int amount) {
-        if (amount <= 0 || (!type.equals("player") && !type.equals("banker") && !type.equals("tie")
-                && !type.equals("perfectPairOne") && !type.equals("pPair")
-                && !type.equals("eitherPair") && !type.equals("bPair"))) {
-            return false; // Érvénytelen tét összeg vagy típus
+        if (amount <= 0 || !isValidType(type)) {
+            return false;
         }
         if (this.player.getChips() < amount) {
-            return false; // Nincs elég zseton a fogadáshoz
+            return false;
         }
         this.betType = type;
         this.betAmount = amount;
@@ -55,19 +53,19 @@ public class BaccaratService {
     public String playRound() {
 
         if (this.player.getChips() < this.betAmount) {
-            return "Nincs elég zsetonod a fogadáshoz. A játék véget ért.";
+            return "You do not have enough chips to place a bet. The game is over";
         }
 
         playerCards = new ArrayList<>();
         bankerCards = new ArrayList<>();
 
-        // A kártyák húzása
+        // Draw the cards
         playerCards.add(deck.draw());
         playerCards.add(deck.draw());
         bankerCards.add(deck.draw());
         bankerCards.add(deck.draw());
 
-        // Reshuffle, ha kevesebb, mint 6 kártya maradt
+        // Reshuffle if less than 6 cards left
         if (deck.getCards().size() < 6) {
             deck.reshuffle();
         }
@@ -95,44 +93,45 @@ public class BaccaratService {
         lastResult = determineOutcome(playerTotal, bankerTotal);
         updateChipsBasedOnResult();
 
-        // Ellenőrizzük, hogy a játékosnak van-e még zsetonja
+        // Check if the player has any chips left
         if (this.player.getChips() <= 0) {
-            return "Elfogytak a zsetonjaid. Vesztettél.";
+            return "You are out of chips. You lose.";
         }
+
 
         return lastResult;
     }
 
     private void updateChipsBasedOnResult() {
-        // Az első két kártya kinyerése a listákból
+        // Get the first two cards from the lists
         Card playerCard1 = playerCards.size() > 0 ? playerCards.get(0) : null;
         Card playerCard2 = playerCards.size() > 1 ? playerCards.get(1) : null;
         Card bankerCard1 = bankerCards.size() > 0 ? bankerCards.get(0) : null;
         Card bankerCard2 = bankerCards.size() > 1 ? bankerCards.get(1) : null;
 
-        // Esetleges harmadik kártyák ellenőrzése
+        // Check for possible third cards
         Card playerThirdCard = playerCards.size() > 2 ? playerCards.get(2) : null;
         Card bankerThirdCard = bankerCards.size() > 2 ? bankerCards.get(2) : null;
 
         int payout = 0;
         boolean isWin = false;
 
-        // A fogadási típusok és a győztesek logikája
+        // Betting types and logic of winners
         switch (this.betType) {
             case "player":
-                if (this.lastResult.startsWith("Játékos nyert")) {
+                if (this.lastResult.startsWith("Player won")) {
                     payout = this.betAmount * 2;
                     isWin = true;
                 }
                 break;
             case "banker":
-                if (this.lastResult.startsWith("Bankár nyert")) {
+                if (this.lastResult.startsWith("Banker won")) {
                     payout = (int) (this.betAmount * 1.95);
                     isWin = true;
                 }
                 break;
             case "tie":
-                if (this.lastResult.startsWith("Döntetlen")) {
+                if (this.lastResult.startsWith("Draw")) {
                     payout = this.betAmount * 8;
                     isWin = true;
                 }
@@ -188,40 +187,40 @@ public class BaccaratService {
 
     private boolean shouldBankerDraw(int bankerTotal, int playerTotal, Card playerThirdCard) {
         if (bankerTotal >= 7) {
-            // A bankár összpontszáma 7 vagy magasabb: nem húz további lapot.
+            // Banker's total is 7 or higher: no further card draws.
             return false;
         } else if (bankerTotal >= 3 && bankerTotal <= 6) {
-            // Speciális szabályok érvényesek, ha a bankár összpontszáma 3 és 6 között van.
+            // Special rules apply if the banker total is between 3 and 6.
             if (playerThirdCard == null) {
-                // Ha a játékos nem húzott harmadik lapot, a bankár akkor húz,
-                // ha az összértéke 5 vagy kevesebb.
+                // If the player has not drawn a third card, the banker draws,
+                // if its total value is 5 or less.
                 return bankerTotal <= 5;
             } else {
-                // A játékos húzott harmadik lapot, így a döntés a lap értékétől függ.
+                // The player has drawn a third card, so the decision depends on the value of the card.
                 int playerThirdCardValue = playerThirdCard.getPoints();
                 switch (bankerTotal) {
                     case 3:
-                        // A bankár húz, kivéve, ha a játékos harmadik lapja 8.
+                        // Banker draws unless the player's third card is 8.
                         return playerThirdCardValue != 8;
                     case 4:
-                        // A bankár húz, ha a játékos harmadik lapja 2-7 között van.
+                        // Banker draws if player's third card is between 2-7.
                         return playerThirdCardValue >= 2 && playerThirdCardValue <= 7;
                     case 5:
-                        // A bankár húz, ha a játékos harmadik lapja 4-7 között van.
+                        // Banker draws if player's third card is between 4-7.
                         return playerThirdCardValue >= 4 && playerThirdCardValue <= 7;
                     case 6:
-                        // A bankár húz, ha a játékos harmadik lapja 6 vagy 7.
+                        // Banker draws if the player's third card is either 6 or 7.
                         return playerThirdCardValue == 6 || playerThirdCardValue == 7;
                     default:
-                        // Minden más esetben a bankár nem húz.
+                        // In all other cases, the banker does not draw.
                         return false;
                 }
             }
         } else {
-            // Ha a bankár összpontszáma 0, 1, vagy 2, mindig húz egy lapot.
-            return true;
-        }
+        // If the banker's total score is 0, 1, or 2, always draw a card.
+        return true;
     }
+}
 
     private int calculateTotal(Card... cards) {
         int total = 0;
@@ -237,21 +236,21 @@ public class BaccaratService {
 
     private String naturalWinResult(int playerTotal, int bankerTotal) {
         if (playerTotal == bankerTotal) {
-            return "Döntetlen! Mindkét fél pontszáma: " + playerTotal;
+            return "Draw! Both sides score: " + playerTotal;
         } else if (playerTotal == 8 || playerTotal == 9) {
-            return "Játékos nyert! Pontszám: " + playerTotal + " vs. Bankár pontszáma: " + bankerTotal;
+            return "Player wins! Score: " + playerTotal + " vs. Banker's score: " + bankerTotal;
         } else {
-            return "Bankár nyert! Pontszám: " + bankerTotal + " vs. Játékos pontszáma: " + playerTotal;
+            return "Banker won! Score: " + bankerTotal + " vs. player score: " + playerTotal;
         }
     }
 
     private String determineOutcome(int playerTotal, int bankerTotal) {
         if (playerTotal > bankerTotal) {
-            return "Játékos nyert! Pontszám: " + playerTotal + " vs. Bankár pontszáma: " + bankerTotal;
+            return "Player won! Score: " + playerTotal + " vs. Banker's score: " + bankerTotal;
         } else if (bankerTotal > playerTotal) {
-            return "Bankár nyert! Pontszám: " + bankerTotal + " vs. Játékos pontszáma: " + playerTotal;
+            return "Banker won! Score: " + bankerTotal + " vs. Player's score: " + playerTotal;
         } else {
-            return "Döntetlen! Mindkét fél pontszáma: " + playerTotal;
+            return "Tie! Both sides score: " + playerTotal;
         }
     }
 
@@ -276,12 +275,15 @@ public class BaccaratService {
     }
 
     public boolean updateChips(int amount) {
-        // Implementáció, hogy frissítsük a játékos zsetonjainak számát
         if (player != null) {
             player.setChips(player.getChips() + amount);
             return true;
         }
         return false;
+    }
+
+    public boolean isValidType(String type){
+        return Deck.isValidBetType(type);
     }
 }
 

@@ -121,3 +121,17 @@ $chip-colors: (#205f88, #f7e50f, #2a8fbd, #f72f2f, #2abf5b);
     }
   }
 }
+
+.chip {
+  cursor: pointer;
+  padding: 10px;
+  margin: 5px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  display: inline-block;
+}
+
+.chip.selected {
+  border-color: #ffdd55;
+  background-color: #ffe680;
+}

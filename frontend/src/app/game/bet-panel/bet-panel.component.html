@@ -1,17 +1,19 @@
 <div class="bet-panel">
 	<div class="chips">
-		<div *ngFor="let chip of chips" class="chip" (click)="selectChip(chip); addToBet()">
+		<div *ngFor="let chip of chips" [class.selected]="chip === selectedChip" class="chip"
+			(click)="selectChip(chip); addToBet()">
 			{{ chip.label }}
 		</div>
 	</div>
 	<div class="bet-options">
-		<button class="btn btn-warning" *ngFor="let option of betOptions" (click)="placeBet(option.type)">
+		<button class="btn btn-warning" *ngFor="let option of betOptions" [disabled]="loading"
+			(click)="placeBet(option.type)">
 			<span class="label">{{ option.label }}</span>
 			<span class="odds">{{ option.odds }}</span>
 		</button>
 	</div>
 	<div class="bet-operations">
-		<button (click)="undoLastBet()">UNDO</button>
-		<button (click)="doubleBet()">DOUBLE</button>
+		<button (click)="undoLastBet()" [disabled]="loading">UNDO</button>
+		<button (click)="doubleBet()" [disabled]="loading">DOUBLE</button>
 	</div>
 </div>
