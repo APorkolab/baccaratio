@@ -18,7 +18,8 @@ public class BaccaratService {
     private int betAmount = 0;
     private List<Card> playerCards = new ArrayList<>();
     private List<Card> bankerCards = new ArrayList<>();
-
+    int payout = 0;
+    boolean isWin = false;
 
     @Autowired
     public BaccaratService(Deck deck) {
@@ -103,36 +104,31 @@ public class BaccaratService {
     }
 
     private void updateChipsBasedOnResult() {
-        // Get the first two cards from the lists
-        Card playerCard1 = playerCards.size() > 0 ? playerCards.get(0) : null;
+
+
+        // Számoljuk ki a játékos és a bankár első két lapjának értékét
+        Card playerCard1 = !playerCards.isEmpty() ? playerCards.get(0) : null;
         Card playerCard2 = playerCards.size() > 1 ? playerCards.get(1) : null;
-        Card bankerCard1 = bankerCards.size() > 0 ? bankerCards.get(0) : null;
+        Card bankerCard1 = !bankerCards.isEmpty() ? bankerCards.get(0) : null;
         Card bankerCard2 = bankerCards.size() > 1 ? bankerCards.get(1) : null;
 
-        // Check for possible third cards
-        Card playerThirdCard = playerCards.size() > 2 ? playerCards.get(2) : null;
-        Card bankerThirdCard = bankerCards.size() > 2 ? bankerCards.get(2) : null;
-
-        int payout = 0;
-        boolean isWin = false;
-
-        // Betting types and logic of winners
+        // Fogadási típusok kezelése
         switch (this.betType) {
             case "player":
-                if (this.lastResult.startsWith("Player won")) {
-                    payout = this.betAmount * 2;
+                if (this.lastResult.contains("Player won!")) {
+                    payout = this.betAmount * 2; // tét duplázása
                     isWin = true;
                 }
                 break;
             case "banker":
-                if (this.lastResult.startsWith("Banker won")) {
-                    payout = (int) (this.betAmount * 1.95);
+                if (this.lastResult.contains("Banker won!")) {
+                    payout = (int) (this.betAmount * 1.95); // Banker győzelem esetén 5% a háznak
                     isWin = true;
                 }
                 break;
             case "tie":
-                if (this.lastResult.startsWith("Draw")) {
-                    payout = this.betAmount * 8;
+                if (this.lastResult.contains("Tie!")) {
+                    payout = this.betAmount * 9; // 8-szoros nyeremény + tét visszatérítése
                     isWin = true;
                 }
                 break;
@@ -167,14 +163,10 @@ public class BaccaratService {
         }
 
         if (isWin) {
-            this.player.win(payout);
+            this.player.win(this.payout);
         } else {
             this.player.lose(this.betAmount);
         }
-
-        // Reset variables for the next round
-        this.betType = "";
-        this.betAmount = 0;
     }
 
     private boolean isPerfectPair(Card card1, Card card2) {

@@ -36,7 +36,7 @@ public class BaccaratServiceTest {
                         new Card("Clubs", "2", 2));   // Banker's second card, ensuring a total less than Player's
 
         String result = baccaratService.playRound();
-        assertEquals("Játékos nyert! Pontszám: 9 vs. Bankár pontszáma: 5", result, "The game outcome should reflect a natural win for the player.");
+        assertEquals("Player won! Score: 9 vs. Banker's score: 5", result, "The game outcome should reflect a natural win for the player.");
     }
 
     @Test
@@ -44,7 +44,7 @@ public class BaccaratServiceTest {
         when(deckMock.draw()).thenReturn(new Card("Hearts", "8", 8), new Card("Spades", "8", 8),
                 new Card("Diamonds", "8", 8), new Card("Clubs", "8", 8));
         String result = baccaratService.playRound();
-        assertEquals("Döntetlen! Mindkét fél pontszáma: 6", result);
+        assertEquals("Tie! Both sides score: 6", result);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class BaccaratServiceTest {
         String result = baccaratService.playRound();
 
         // Verify the outcome is a banker win due to a natural 9
-        assertEquals("Bankár nyert! Pontszám: 9 vs. Játékos pontszáma: 1", result);
+        assertEquals("Banker won! Score: 9 vs. Player's score: 1", result);
     }
 
 
@@ -70,7 +70,7 @@ public class BaccaratServiceTest {
         when(deckMock.draw()).thenReturn(new Card("Hearts", "4", 4), new Card("Spades", "1", 1),
                 new Card("Diamonds", "6", 6), new Card("Clubs", "5", 5), new Card("Hearts", "2", 2));
         String result = baccaratService.playRound();
-        Assertions.assertTrue(result.contains("Játékos nyert! Pontszám: 7")); // Feltételezve, hogy a harmadik lap a játékos számára kedvező
+        Assertions.assertTrue(result.contains("Player won! Score: 7")); // Feltételezve, hogy a harmadik lap a játékos számára kedvező
     }
 
     @Test
@@ -84,7 +84,7 @@ public class BaccaratServiceTest {
                         new Card("Hearts", "5", 5)); // Player's third card, if applicable
 
         String result = baccaratService.playRound();
-        Assertions.assertTrue(result.startsWith("Bankár nyert"), "The outcome should reflect that the Banker drew a third card and won or the game logic led to a Banker win.");
+        Assertions.assertTrue(result.startsWith("Banker won!"), "The outcome should reflect that the Banker drew a third card and won or the game logic led to a Banker win.");
 
     }
 
@@ -140,19 +140,22 @@ public class BaccaratServiceTest {
         String result = baccaratService.playRound();
 
         // Ellenőrizzük, hogy a kimenet megfelel-e a természetes döntetlen szabályainak
-        assertEquals("Döntetlen! Mindkét fél pontszáma: 8", result);
+        assertEquals("Tie! Both sides score: 8", result);
     }
 
     @Test
     public void testTieReturnsBet() {
         baccaratService.getPlayer().setChips(50);
         baccaratService.placeBet("tie", 10);
-        // Konfiguráljuk úgy, hogy döntetlen legyen (pl. mindkét fél pontszáma 8)
-        when(deckMock.draw()).thenReturn(new Card("Hearts", "8", 8), new Card("Diamonds", "Q", 0),
-                new Card("Spades", "8", 8), new Card("Clubs", "K", 0),
-                new Card("Hearts", "2", 2)); // További lapok, ha szükséges
+        when(deckMock.draw()).thenReturn(
+                new Card("Hearts", "8", 8),
+                new Card("Diamonds", "Q", 0),
+                new Card("Spades", "8", 8),
+                new Card("Clubs", "K", 0),
+                new Card("Hearts", "2", 2)
+        );
         baccaratService.playRound();
-        assertEquals(130, baccaratService.getPlayer().getChips()); // A tét visszatérítésre kerül döntetlen esetén
+        assertEquals(140, baccaratService.getPlayer().getChips()); // 50 kezdő zseton + 90 nyeremény (tét + 8x tét)
     }
 
     @Test
@@ -162,30 +165,69 @@ public class BaccaratServiceTest {
 
     @Test
     public void testPayoutForTieBet() {
-        // Kezdeti zsetonszám beállítása
         baccaratService.getPlayer().setChips(100);
-
-        // Fogadás helyezése "tie"-ra 10 zsetonnal
         baccaratService.placeBet("tie", 10);
-
-        // Mockoljuk a paklit, hogy biztos döntetlen legyen
         when(deckMock.draw()).thenReturn(
-                new Card("Hearts", "8", 8),   // Játékos lap 1
-                new Card("Spades", "K", 0),   // Játékos lap 2
-                new Card("Diamonds", "8", 8), // Bankár lap 1
-                new Card("Clubs", "K", 0)     // Bankár lap 2
+                new Card("Hearts", "8", 8),
+                new Card("Spades", "K", 0),
+                new Card("Diamonds", "8", 8),
+                new Card("Clubs", "K", 0)
         );
-
-        // A játék kör lejátszása
         baccaratService.playRound();
-
-        // Ellenőrizzük, hogy a zsetonok száma helyesen 180-ra nőtt-e
-        assertEquals(180, baccaratService.getPlayer().getChips(), "A zsetonok száma nem megfelelő a döntetlen fogadás után.");
+        assertEquals(190, baccaratService.getPlayer().getChips()); // 100 kezdő zseton + 90 nyeremény (tét + 8x tét)
     }
 
     @Test
     public void testNegativeBetAmount() {
         Assertions.assertFalse(baccaratService.placeBet("player", -10)); // Érvénytelen fogadási összeg
+    }
+
+    @Test
+    public void testPerfectPairBet() {
+        baccaratService.getPlayer().setChips(100);
+        baccaratService.placeBet("perfectPairOne", 10);
+        when(deckMock.draw()).thenReturn(
+                new Card("Hearts", "8", 8), new Card("Hearts", "8", 8),  // Tökéletes pár a játékosnak
+                new Card("Spades", "K", 0), new Card("Clubs", "K", 0)   // Nem pár a bankárnak
+        );
+        baccaratService.playRound();
+        assertEquals(350, baccaratService.getPlayer().getChips());
+    }
+
+    @Test
+    public void testPlayerPairBet() {
+        baccaratService.getPlayer().setChips(100);
+        baccaratService.placeBet("playerPair", 10);
+        when(deckMock.draw()).thenReturn(
+                new Card("Hearts", "8", 8), new Card("Diamonds", "8", 8), // Pár a játékosnak
+                new Card("Spades", "K", 0), new Card("Clubs", "K", 0)    // Nem pár a bankárnak
+        );
+        baccaratService.playRound();
+        assertEquals(210, baccaratService.getPlayer().getChips());
+    }
+
+    @Test
+    public void testBankerPairBet() {
+        baccaratService.getPlayer().setChips(100);
+        baccaratService.placeBet("bankerPair", 10);
+        when(deckMock.draw()).thenReturn(
+                new Card("Hearts", "8", 8), new Card("Diamonds", "K", 0), // Nem pár a játékosnak
+                new Card("Spades", "K", 0), new Card("Clubs", "K", 0)    // Pár a bankárnak
+        );
+        baccaratService.playRound();
+        assertEquals(210, baccaratService.getPlayer().getChips());
+    }
+
+    @Test
+    public void testEitherPairBet() {
+        baccaratService.getPlayer().setChips(100);
+        baccaratService.placeBet("eitherPair", 10);
+        when(deckMock.draw()).thenReturn(
+                new Card("Hearts", "8", 8), new Card("Diamonds", "K", 0), // Nem pár a játékosnak
+                new Card("Spades", "K", 0), new Card("Clubs", "K", 0)    // Pár a bankárnak
+        );
+        baccaratService.playRound();
+        assertEquals(150, baccaratService.getPlayer().getChips());
     }
 
 }
