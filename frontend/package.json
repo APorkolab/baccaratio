@@ -1,38 +1,44 @@
 {
   "name": "baccaratio",
   "version": "1.0.0",
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
+    "start": "npx serve -s dist/baccaratio",
+    "build": "ng build --configuration=production",
+    "watch": "ng build --watch --configuration=development",
     "test": "ng test"
   },
   "private": true,
+  "homepage": "https://www.baccaratio.porkolab.hu",
   "dependencies": {
-    "@angular/animations": "^17.3.1",
-    "@angular/common": "^17.3.1",
-    "@angular/compiler": "^17.3.1",
-    "@angular/core": "^17.3.1",
-    "@angular/forms": "^17.3.1",
-    "@angular/platform-browser": "^17.3.1",
-    "@angular/platform-browser-dynamic": "^17.3.1",
-    "@angular/router": "^17.3.1",
-    "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.14.4"
+    "@angular/animations": "^18.2.0",
+    "@angular/common": "^18.2.0",
+    "@angular/compiler": "^18.2.0",
+    "@angular/core": "^18.2.0",
+    "@angular/forms": "^18.2.0",
+    "@angular/platform-browser": "^18.2.0",
+    "@angular/platform-browser-dynamic": "^18.2.0",
+    "@angular/router": "^18.2.0",
+    "baccaratio": "file:",
+    "rxjs": "~7.8.1",
+    "tslib": "^2.6.3",
+    "zone.js": "~0.14.10"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^17.3.1",
-    "@angular/cli": "^17.3.1",
-    "@angular/compiler-cli": "^17.3.1",
-    "@types/jasmine": "~4.3.0",
-    "jasmine-core": "~4.6.0",
-    "karma": "~6.4.0",
+    "@angular-devkit/build-angular": "^18.2.0",
+    "@angular/cli": "^18.2.0",
+    "@angular/compiler-cli": "^18.2.0",
+    "@types/jasmine": "~5.1.4",
+    "jasmine-core": "~5.2.0",
+    "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
+    "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.4.3"
+    "typescript": "~5.5.4"
   }
 }
