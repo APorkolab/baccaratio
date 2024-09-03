@@ -112,6 +112,7 @@ public class BaccaratController {
 
     @GetMapping("/")
     public Map<String, String> home() {
-        return Map.of("message", "Welcome to the Baccarat Game API!");
+        return Map.of("message",
+                "Welcome to the Baccarat Game API! Default URL of Swagger Docs: http://localhost:8080/swagger-ui/index.html");
     }
 }
