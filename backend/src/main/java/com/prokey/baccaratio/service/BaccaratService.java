@@ -3,7 +3,6 @@ package com.prokey.baccaratio.service;
 import com.prokey.baccaratio.model.Card;
 import com.prokey.baccaratio.model.Deck;
 import com.prokey.baccaratio.model.Player;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,14 +13,13 @@ public class BaccaratService {
     private Deck deck;
     private Player player;
     private String lastResult = "";
-    private String betType = "";
+    private BetType betType;
     private int betAmount = 0;
     private List<Card> playerCards = new ArrayList<>();
     private List<Card> bankerCards = new ArrayList<>();
     int payout = 0;
     boolean isWin = false;
 
-    @Autowired
     public BaccaratService(Deck deck) {
         this.deck = deck;
         this.player = new Player("Babiagorai Riparievich Metell", 1000);
@@ -35,11 +33,8 @@ public class BaccaratService {
         this.player = player;
     }
 
-    public boolean placeBet(String type, int amount) {
-        if (amount <= 0 || !isValidType(type)) {
-            return false;
-        }
-        if (this.player.getChips() < amount) {
+    public boolean placeBet(BetType type, int amount) {
+        if (amount <= 0 || this.player.getChips() < amount) {
             return false;
         }
         this.betType = type;
@@ -52,120 +47,131 @@ public class BaccaratService {
     }
 
     public String playRound() {
-
-        if (this.player.getChips() < this.betAmount) {
-            return "You do not have enough chips to place a bet. The game is over";
+        if (this.betAmount == 0 || this.betType == null) {
+            return "Fogadást kell tennie a kör megkezdése előtt.";
+        }
+        if (this.betAmount > this.player.getChips()) {
+            return "Nincs elég zsetonja ehhez a fogadáshoz. A játék nem indulhat el.";
         }
 
-        playerCards = new ArrayList<>();
-        bankerCards = new ArrayList<>();
+        deck.reshuffle();
+        resetRound();
+        drawInitialCards();
 
-        // Draw the cards
-        playerCards.add(deck.draw());
-        playerCards.add(deck.draw());
-        bankerCards.add(deck.draw());
-        bankerCards.add(deck.draw());
+        int playerTotal = calculateTotal(playerCards);
+        int bankerTotal = calculateTotal(bankerCards);
 
-        // Reshuffle if less than 6 cards left
-        if (deck.getCards().size() < 6) {
-            deck.reshuffle();
+        // Ellenőrizze a természetes győzelmet
+        if (playerTotal >= 8 || bankerTotal >= 8) {
+            lastResult = determineOutcome(playerTotal, bankerTotal);
+            updateChipsBasedOnResult();
+            return lastResult;
         }
 
-        int playerTotal = calculateTotal(playerCards.get(0), playerCards.get(1));
-        int bankerTotal = calculateTotal(bankerCards.get(0), bankerCards.get(1));
-
-        // A játék logikája
-        if (!(playerTotal == 8 || playerTotal == 9 || bankerTotal == 8 || bankerTotal == 9)) {
-            Card playerThirdCard = null;
-            if (playerTotal <= 5) {
-                playerThirdCard = deck.draw();
-                playerCards.add(playerThirdCard);
-                playerTotal = calculateTotalWithCard(playerTotal, playerThirdCard);
-            }
-
-            Card bankerThirdCard = null;
-            if (shouldBankerDraw(bankerTotal, playerTotal, playerThirdCard)) {
-                bankerThirdCard = deck.draw();
-                bankerCards.add(bankerThirdCard);
-                bankerTotal = calculateTotalWithCard(bankerTotal, bankerThirdCard);
-            }
-        }
+        // Ha nincs természetes győzelem, folytassa a játékmenetet
+        drawAdditionalCards(playerTotal, bankerTotal);
+        playerTotal = calculateTotal(playerCards);
+        bankerTotal = calculateTotal(bankerCards);
 
         lastResult = determineOutcome(playerTotal, bankerTotal);
         updateChipsBasedOnResult();
 
-        // Check if the player has any chips left
         if (this.player.getChips() <= 0) {
-            return "You are out of chips. You lose.";
+            return "Elfogytak a zsetonjai. Vesztett.";
         }
-
 
         return lastResult;
     }
 
-    private void updateChipsBasedOnResult() {
+    private void resetRound() {
+        payout = 0;
+        isWin = false;
+        playerCards.clear();
+        bankerCards.clear();
+    }
 
+    private void drawInitialCards() {
+        playerCards.add(deck.draw());
+        playerCards.add(deck.draw());
+        bankerCards.add(deck.draw());
+        bankerCards.add(deck.draw());
+    }
 
-        // Számoljuk ki a játékos és a bankár első két lapjának értékét
-        Card playerCard1 = !playerCards.isEmpty() ? playerCards.get(0) : null;
-        Card playerCard2 = playerCards.size() > 1 ? playerCards.get(1) : null;
-        Card bankerCard1 = !bankerCards.isEmpty() ? bankerCards.get(0) : null;
-        Card bankerCard2 = bankerCards.size() > 1 ? bankerCards.get(1) : null;
-
-        // Fogadási típusok kezelése
-        switch (this.betType) {
-            case "player":
-                if (this.lastResult.contains("Player won!")) {
-                    payout = this.betAmount * 2; // tét duplázása
-                    isWin = true;
-                }
-                break;
-            case "banker":
-                if (this.lastResult.contains("Banker won!")) {
-                    payout = (int) (this.betAmount * 1.95); // Banker győzelem esetén 5% a háznak
-                    isWin = true;
-                }
-                break;
-            case "tie":
-                if (this.lastResult.contains("Tie!")) {
-                    payout = this.betAmount * 9; // 8-szoros nyeremény + tét visszatérítése
-                    isWin = true;
-                }
-                break;
-            case "perfectPairOne":
-                if ((playerCard1 != null && playerCard2 != null && isPerfectPair(playerCard1, playerCard2)) ||
-                        (bankerCard1 != null && bankerCard2 != null && isPerfectPair(bankerCard1, bankerCard2))) {
-                    payout = this.betAmount * 25;
-                    isWin = true;
-                }
-                break;
-            case "playerPair":
-                if (playerCard1 != null && playerCard2 != null && isPair(playerCard1, playerCard2)) {
-                    payout = this.betAmount * 11;
-                    isWin = true;
-                }
-                break;
-            case "bankerPair":
-                if (bankerCard1 != null && bankerCard2 != null && isPair(bankerCard1, bankerCard2)) {
-                    payout = this.betAmount * 11;
-                    isWin = true;
-                }
-                break;
-            case "eitherPair":
-                if ((playerCard1 != null && playerCard2 != null && isPair(playerCard1, playerCard2)) ||
-                        (bankerCard1 != null && bankerCard2 != null && isPair(bankerCard1, bankerCard2))) {
-                    payout = this.betAmount * 5;
-                    isWin = true;
-                }
-                break;
-            default:
-                break;
+    private void drawAdditionalCards(int playerTotal, int bankerTotal) {
+        if (playerTotal <= 5) {
+            playerCards.add(deck.draw());
+            playerTotal = calculateTotal(playerCards);
         }
 
-        if (isWin) {
-            this.player.win(this.payout);
+        if (bankerTotal <= 5) {
+            if (playerCards.size() == 2
+                    || (playerCards.size() == 3 && shouldBankerDraw(bankerTotal, playerCards.get(2).getPoints()))) {
+                bankerCards.add(deck.draw());
+            }
+        }
+    }
+
+    private boolean shouldBankerDraw(int bankerTotal, int playerThirdCardValue) {
+        if (bankerTotal <= 2)
+            return true;
+        if (bankerTotal == 3 && playerThirdCardValue != 8)
+            return true;
+        if (bankerTotal == 4 && (playerThirdCardValue >= 2 && playerThirdCardValue <= 7))
+            return true;
+        if (bankerTotal == 5 && (playerThirdCardValue >= 4 && playerThirdCardValue <= 7))
+            return true;
+        if (bankerTotal == 6 && (playerThirdCardValue == 6 || playerThirdCardValue == 7))
+            return true;
+        return false;
+    }
+
+    public synchronized void updateChipsBasedOnResult() {
+        payout = calculatePayout(
+                playerCards.size() > 0 ? playerCards.get(0) : null,
+                playerCards.size() > 1 ? playerCards.get(1) : null,
+                bankerCards.size() > 0 ? bankerCards.get(0) : null,
+                bankerCards.size() > 1 ? bankerCards.get(1) : null);
+
+        if (this.lastResult.contains("Tie!")) {
+            handleTieResult();
+        } else if (payout > 0) {
+            // Ha a játékos nyer, adjuk hozzá a tétet és a nyereményt a zsetonjaihoz
+            this.player.win(payout + this.betAmount);
         } else {
+            // Ha a játékos veszít, vonjuk le a tétet
             this.player.lose(this.betAmount);
+        }
+    }
+
+    private int calculatePayout(Card playerCard1, Card playerCard2, Card bankerCard1, Card bankerCard2) {
+        switch (this.betType) {
+            case PLAYER:
+                return this.lastResult.contains("Player won!") ? this.betAmount * 2 : 0;
+            case BANKER:
+                return this.lastResult.contains("Banker won!") ? (int) (this.betAmount * 1.95) : 0;
+            case TIE:
+                return this.lastResult.contains("Tie!") ? this.betAmount * 8 : 0;
+            case PERFECT_PAIR_ONE:
+                return (isPerfectPair(playerCard1, playerCard2) || isPerfectPair(bankerCard1, bankerCard2))
+                        ? this.betAmount * 25
+                        : 0;
+            case PLAYER_PAIR:
+                return isPair(playerCard1, playerCard2) ? this.betAmount * 11 : 0;
+            case BANKER_PAIR:
+                return isPair(bankerCard1, bankerCard2) ? this.betAmount * 11 : 0;
+            case EITHER_PAIR:
+                return (isPair(playerCard1, playerCard2) || isPair(bankerCard1, bankerCard2)) ? this.betAmount * 5 : 0;
+            default:
+                return 0;
+        }
+    }
+
+    private void handleTieResult() {
+        if (this.betType == BetType.TIE) {
+            this.player.win(this.payout + this.betAmount);
+        } else {
+            // Döntetlen esetén vissza kell adni a tétet, ha nem TIE-re fogadtak
+            this.player.win(this.betAmount);
         }
     }
 
@@ -177,72 +183,30 @@ public class BaccaratService {
         return card1.getValue().equals(card2.getValue());
     }
 
-    private boolean shouldBankerDraw(int bankerTotal, int playerTotal, Card playerThirdCard) {
-        if (bankerTotal >= 7) {
-            // Banker's total is 7 or higher: no further card draws.
-            return false;
-        } else if (bankerTotal >= 3 && bankerTotal <= 6) {
-            // Special rules apply if the banker total is between 3 and 6.
-            if (playerThirdCard == null) {
-                // If the player has not drawn a third card, the banker draws,
-                // if its total value is 5 or less.
-                return bankerTotal <= 5;
-            } else {
-                // The player has drawn a third card, so the decision depends on the value of the card.
-                int playerThirdCardValue = playerThirdCard.getPoints();
-                switch (bankerTotal) {
-                    case 3:
-                        // Banker draws unless the player's third card is 8.
-                        return playerThirdCardValue != 8;
-                    case 4:
-                        // Banker draws if player's third card is between 2-7.
-                        return playerThirdCardValue >= 2 && playerThirdCardValue <= 7;
-                    case 5:
-                        // Banker draws if player's third card is between 4-7.
-                        return playerThirdCardValue >= 4 && playerThirdCardValue <= 7;
-                    case 6:
-                        // Banker draws if the player's third card is either 6 or 7.
-                        return playerThirdCardValue == 6 || playerThirdCardValue == 7;
-                    default:
-                        // In all other cases, the banker does not draw.
-                        return false;
-                }
-            }
-        } else {
-        // If the banker's total score is 0, 1, or 2, always draw a card.
-        return true;
-    }
-}
-
-    private int calculateTotal(Card... cards) {
-        int total = 0;
-        for (Card card : cards) {
-            total += card.getPoints();
-        }
+    private int calculateTotal(List<Card> cards) {
+        int total = cards.stream().mapToInt(Card::getPoints).sum();
         return total % 10;
     }
 
-    private int calculateTotalWithCard(int currentTotal, Card card) {
-        return (currentTotal + card.getPoints()) % 10;
-    }
-
-    private String naturalWinResult(int playerTotal, int bankerTotal) {
-        if (playerTotal == bankerTotal) {
-            return "Draw! Both sides score: " + playerTotal;
-        } else if (playerTotal == 8 || playerTotal == 9) {
-            return "Player wins! Score: " + playerTotal + " vs. Banker's score: " + bankerTotal;
-        } else {
-            return "Banker won! Score: " + bankerTotal + " vs. player score: " + playerTotal;
-        }
-    }
-
     private String determineOutcome(int playerTotal, int bankerTotal) {
-        if (playerTotal > bankerTotal) {
-            return "Player won! Score: " + playerTotal + " vs. Banker's score: " + bankerTotal;
-        } else if (bankerTotal > playerTotal) {
-            return "Banker won! Score: " + bankerTotal + " vs. Player's score: " + playerTotal;
+        if (playerTotal == 9 && bankerTotal == 9) {
+            return "Tie! Both sides have a natural 9.";
+        } else if (playerTotal == 9) {
+            return String.format("Player won with a natural 9! Player's score: 9 vs. Banker's score: %d", bankerTotal);
+        } else if (bankerTotal == 9) {
+            return String.format("Banker won with a natural 9! Banker's score: 9 vs. Player's score: %d", playerTotal);
+        } else if (playerTotal == 8 && bankerTotal == 8) {
+            return "Tie! Both sides have a natural 8.";
+        } else if (playerTotal == 8) {
+            return String.format("Player won with a natural 8! Player's score: 8 vs. Banker's score: %d", bankerTotal);
+        } else if (bankerTotal == 8) {
+            return String.format("Banker won with a natural 8! Banker's score: 8 vs. Player's score: %d", playerTotal);
+        } else if (playerTotal == bankerTotal) {
+            return String.format("Tie! Both sides score: %d", playerTotal);
+        } else if (playerTotal > bankerTotal) {
+            return String.format("Player won! Score: %d vs. Banker's score: %d", playerTotal, bankerTotal);
         } else {
-            return "Tie! Both sides score: " + playerTotal;
+            return String.format("Banker won! Score: %d vs. Player's score: %d", bankerTotal, playerTotal);
         }
     }
 
@@ -254,28 +218,40 @@ public class BaccaratService {
         return lastResult;
     }
 
-    public String getBetType() {
+    public BetType getBetType() {
         return betType;
     }
 
     public List<Card> getPlayerCards() {
-        return playerCards;
+        return new ArrayList<>(playerCards);
     }
 
     public List<Card> getBankerCards() {
-        return bankerCards;
+        return new ArrayList<>(bankerCards);
     }
 
     public boolean updateChips(int amount) {
-        if (player != null) {
-            player.setChips(player.getChips() + amount);
-            return true;
+        if (player != null && amount != 0) {
+            int newChips = player.getChips() + amount;
+            if (newChips >= 0) {
+                player.setChips(newChips);
+                return true;
+            }
         }
         return false;
     }
 
-    public boolean isValidType(String type){
+    public boolean isValidType(String type) {
         return Deck.isValidBetType(type);
     }
-}
 
+    public enum BetType {
+        PLAYER,
+        BANKER,
+        TIE,
+        PERFECT_PAIR_ONE,
+        PLAYER_PAIR,
+        BANKER_PAIR,
+        EITHER_PAIR
+    }
+}

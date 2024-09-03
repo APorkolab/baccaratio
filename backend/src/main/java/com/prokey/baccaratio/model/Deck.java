@@ -29,9 +29,9 @@ public class Deck {
      * Initializes the deck with a standard set of Baccarat cards.
      */
     private void initializeDeck() {
-        String[] suits = {"Hearts", "Diamonds", "Clubs", "Spades"};
-        String[] values = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
-        int[] points = {1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0}; // Points according to Baccarat rules
+        String[] suits = { "Hearts", "Diamonds", "Clubs", "Spades" };
+        String[] values = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
+        int[] points = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0 }; // Points according to Baccarat rules
 
         for (String suit : suits) {
             for (int i = 0; i < values.length; i++) {
@@ -48,14 +48,15 @@ public class Deck {
             "perfectPairOne",
             "playerPair",
             "eitherPair",
-            "bankerPair"
-    );
+            "bankerPair");
 
     /**
-     * Draws a card from the deck. If the deck is empty, it reshuffles before drawing.
+     * Draws a card from the deck. If the deck is empty, it reshuffles before
+     * drawing.
+     * 
      * @return the drawn card
      */
-    public Card draw() {
+    public synchronized Card draw() {
         if (cards.isEmpty()) {
             reshuffle(); // Reshuffle if the deck is empty
         }
@@ -79,6 +80,7 @@ public class Deck {
 
     /**
      * Checks if a given bet type is valid.
+     * 
      * @param type The bet type to check.
      * @return true if the type is a valid bet type, false otherwise.
      */
