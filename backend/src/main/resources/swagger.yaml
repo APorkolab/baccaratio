@@ -1,0 +1,248 @@
+openapi: 3.0.0
+info:
+  title: Baccarat Game API
+  description: API for managing a Baccarat game
+  version: 1.0.0
+servers:
+  - url: https://api.baccaratio.porkolab.hu/
+paths:
+  /bet/{type}/{amount}:
+    post:
+      summary: Place a bet
+      parameters:
+        - in: path
+          name: type
+          required: true
+          schema:
+            type: string
+          description: The type of bet (e.g., PLAYER, BANKER, TIE, PERFECT_PAIR_ONE, PLAYER_PAIR, BANKER_PAIR, EITHER_PAIR)
+        - in: path
+          name: amount
+          required: true
+          schema:
+            type: integer
+          description: The amount to bet
+      responses:
+        '200':
+          description: Bet placed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid bet or insufficient chips
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /play:
+    get:
+      summary: Play a round of Baccarat
+      responses:
+        '200':
+          description: Round played successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: A string describing the result of the round
+
+  /cards:
+    get:
+      summary: Get the current cards on the table
+      responses:
+        '200':
+          description: Cards retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  playerCards:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Card'
+                  bankerCards:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Card'
+
+  /result:
+    get:
+      summary: Get the result of the last round
+      responses:
+        '200':
+          description: Result retrieved successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /player:
+    get:
+      summary: Get player information
+      responses:
+        '200':
+          description: Player information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+        '400':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /player/chips:
+    get:
+      summary: Get player's current chip count
+      responses:
+        '200':
+          description: Chip count retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chips:
+                    type: integer
+        '400':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+    post:
+      summary: Update player's chip count
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+      responses:
+        '200':
+          description: Chips updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Failed to update chips
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /player/name:
+    get:
+      summary: Get player's name
+      responses:
+        '200':
+          description: Player name retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+        '400':
+          description: Player name is not set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+    put:
+      summary: Set player's name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Player name updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid name or player not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /:
+    get:
+      summary: Welcome message
+      responses:
+        '200':
+          description: Welcome message retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    Card:
+      type: object
+      properties:
+        suit:
+          type: string
+        value:
+          type: string
+        points:
+          type: integer
+
+    Player:
+      type: object
+      properties:
+        name:
+          type: string
+        chips:
+          type: integer
