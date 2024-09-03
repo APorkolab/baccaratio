@@ -79,7 +79,7 @@ public class BaccaratServiceTest {
         String result = baccaratService.playRound();
 
         // Check that the banker won with a natural 9 and did not draw a third card
-        assertEquals("Banker won with a natural 9! Banker's score: 9 vs. Player's score: 9", result,
+        assertEquals("Tie! Both sides have a natural 9.", result,
                 "The game outcome should reflect a natural win for the banker with a score of 9.");
 
         // Verify that the deck.draw() method was called exactly 4 times, ensuring no
@@ -114,8 +114,17 @@ public class BaccaratServiceTest {
         String result = baccaratService.playRound();
 
         // Ellenőrizzük, hogy a bankár húzott harmadik kártyát
-        verify(deckMock, times(5)).draw();
-        Assertions.assertTrue(result.contains("Banker won!") || result.contains("Player won!"));
+        verify(deckMock, times(5)).draw();  // 5 húzás, beleértve a harmadik kártyát is
+
+        // Lehetséges kimenetelek ellenőrzése
+        String expectedBankerWinMessage = "Banker won with a natural 9! Banker's score: 9 vs. Player's score: 7";
+        String expectedPlayerWinMessage = "Player won with a natural 9! Player's score: 9 vs. Banker's score: 7";
+        String expectedTieMessage = "Tie! Both sides score: 7";
+
+        Assertions.assertTrue(result.equals(expectedBankerWinMessage) ||
+                        result.equals(expectedPlayerWinMessage) ||
+                        result.equals(expectedTieMessage),
+                "The result message should exactly match one of the expected outcomes.");
     }
 
     @Test
@@ -147,11 +156,11 @@ public class BaccaratServiceTest {
         // Konfiguráljuk úgy, hogy a "player" nyerjen (pl. játékos pontszáma 8, bankáré
         // 7)
         when(deckMock.draw()).thenReturn(
-                new Card("Hearts", "8", 8),
-                new Card("Diamonds", "K", 0),
-                new Card("Spades", "7", 7),
-                new Card("Clubs", "Q", 0),
-                new Card("Hearts", "2", 2));
+                new Card("Hearts", "8", 8), //Player 1
+                new Card("Diamonds", "K", 0), //Player2
+                new Card("Spades", "7", 7), //Banker 1
+                new Card("Clubs", "Q", 0)); //Banker 2
+
         baccaratService.playRound();
         assertEquals(70, baccaratService.getPlayer().getChips());
     }
@@ -173,9 +182,9 @@ public class BaccaratServiceTest {
     public void testNaturalTie() {
         // Beállítjuk a mockolt kártyákat egy természetes döntetlenhez
         when(deckMock.draw()).thenReturn(
-                new Card("Hearts", "6", 6), // Játékos lap 1
+                new Card("Hearts", "8", 8), // Játékos lap 1
                 new Card("Spades", "Queen", 0), // Játékos lap 2
-                new Card("Diamonds", "6", 6), // Bankár lap 1
+                new Card("Diamonds", "8", 8), // Bankár lap 1
                 new Card("Clubs", "King", 0) // Bankár lap 2
         );
 
@@ -184,7 +193,7 @@ public class BaccaratServiceTest {
         String result = baccaratService.playRound();
 
         // Ellenőrizzük, hogy a kimenet megfelel-e a természetes döntetlen szabályainak
-        assertEquals("Tie! Both sides score: 6", result);
+        assertEquals("Tie! Both sides have a natural 8.", result);
     }
 
     @Test

@@ -19,6 +19,8 @@ public class BaccaratService {
     private List<Card> bankerCards = new ArrayList<>();
     int payout = 0;
     boolean isWin = false;
+    private boolean isBankerWin;
+    private boolean isTie;
 
     public BaccaratService(Deck deck) {
         this.deck = deck;
@@ -130,15 +132,16 @@ public class BaccaratService {
                 playerCards.size() > 0 ? playerCards.get(0) : null,
                 playerCards.size() > 1 ? playerCards.get(1) : null,
                 bankerCards.size() > 0 ? bankerCards.get(0) : null,
-                bankerCards.size() > 1 ? bankerCards.get(1) : null);
+                bankerCards.size() > 1 ? bankerCards.get(1) : null
+        );
 
         if (this.lastResult.contains("Tie!")) {
-            handleTieResult();
-        } else if (payout > 0) {
-            // Ha a játékos nyer, adjuk hozzá a tétet és a nyereményt a zsetonjaihoz
-            this.player.win(payout + this.betAmount);
+            handleTieResult();  // Kezeljük a döntetlent külön
+        } else if (isWin && payout > 0) {
+            // Ha a játékos nyer, hozzáadjuk a tétet és a nyereményt a zsetonjaihoz
+            this.player.win(payout);
         } else {
-            // Ha a játékos veszít, vonjuk le a tétet
+            // Ha veszít a játékos, csak a tétet vonjuk le
             this.player.lose(this.betAmount);
         }
     }
@@ -146,11 +149,11 @@ public class BaccaratService {
     private int calculatePayout(Card playerCard1, Card playerCard2, Card bankerCard1, Card bankerCard2) {
         switch (this.betType) {
             case PLAYER:
-                return this.lastResult.contains("Player won!") ? this.betAmount * 2 : 0;
+                return isWin ? this.betAmount * 2 : 0;
             case BANKER:
-                return this.lastResult.contains("Banker won!") ? (int) (this.betAmount * 1.95) : 0;
+                return isBankerWin ? (int) (this.betAmount * 0.95) : 0;
             case TIE:
-                return this.lastResult.contains("Tie!") ? this.betAmount * 8 : 0;
+                return isTie ? this.betAmount * 8 : 0;
             case PERFECT_PAIR_ONE:
                 return (isPerfectPair(playerCard1, playerCard2) || isPerfectPair(bankerCard1, bankerCard2))
                         ? this.betAmount * 25
@@ -168,10 +171,79 @@ public class BaccaratService {
 
     private void handleTieResult() {
         if (this.betType == BetType.TIE) {
-            this.player.win(this.payout + this.betAmount);
+            // Ha TIE fogadásra történt, visszaadjuk a tétet és a nyereményt
+            this.player.win(this.betAmount + this.betAmount * 8);  // Tét vissza + 8x nyeremény
         } else {
-            // Döntetlen esetén vissza kell adni a tétet, ha nem TIE-re fogadtak
+            // Döntetlen esetén visszaadjuk a tétet, ha nem TIE-re fogadtak
             this.player.win(this.betAmount);
+        }
+    }
+
+    private String determineOutcome(int playerTotal, int bankerTotal) {
+        if (isNaturalTie(playerTotal, bankerTotal, 9)) {
+            return generateTieMessage(9);
+        }
+        if (isNaturalWin(playerTotal, 9)) {
+            return generatePlayerWinMessage(9, bankerTotal);
+        }
+        if (isNaturalWin(bankerTotal, 9)) {
+            return generateBankerWinMessage(9, playerTotal);
+        }
+        if (isNaturalTie(playerTotal, bankerTotal, 8)) {
+            return generateTieMessage(8);
+        }
+        if (isNaturalWin(playerTotal, 8)) {
+            return generatePlayerWinMessage(8, bankerTotal);
+        }
+        if (isNaturalWin(bankerTotal, 8)) {
+            return generateBankerWinMessage(8, playerTotal);
+        }
+        if (playerTotal == bankerTotal) {
+            return generateTieMessage(playerTotal);
+        }
+        return determineStandardWin(playerTotal, bankerTotal);
+    }
+
+    private boolean isNaturalTie(int playerTotal, int bankerTotal, int naturalValue) {
+        return playerTotal == naturalValue && bankerTotal == naturalValue;
+    }
+
+    private boolean isNaturalWin(int total, int naturalValue) {
+        return total == naturalValue;
+    }
+
+    private String generateTieMessage(int score) {
+        isWin = false;
+        isBankerWin = false;
+        isTie = true;
+        return String.format("Tie! Both sides have a natural %d.", score);
+    }
+
+    private String generatePlayerWinMessage(int playerScore, int bankerScore) {
+        isWin = true;
+        isBankerWin = false;
+        isTie = false;
+        return String.format("Player won with a natural %d! Player's score: %d vs. Banker's score: %d", playerScore, playerScore, bankerScore);
+    }
+
+    private String generateBankerWinMessage(int bankerScore, int playerScore) {
+        isWin = false;
+        isBankerWin = true;
+        isTie = false;
+        return String.format("Banker won with a natural %d! Banker's score: %d vs. Player's score: %d", bankerScore, bankerScore, playerScore);
+    }
+
+    private String determineStandardWin(int playerTotal, int bankerTotal) {
+        if (playerTotal > bankerTotal) {
+            isWin = true;
+            isBankerWin = false;
+            isTie = false;
+            return String.format("Player won! Score: %d vs. Banker's score: %d", playerTotal, bankerTotal);
+        } else {
+            isWin = false;
+            isBankerWin = true;
+            isTie = false;
+            return String.format("Banker won! Score: %d vs. Player's score: %d", bankerTotal, playerTotal);
         }
     }
 
@@ -186,28 +258,6 @@ public class BaccaratService {
     private int calculateTotal(List<Card> cards) {
         int total = cards.stream().mapToInt(Card::getPoints).sum();
         return total % 10;
-    }
-
-    private String determineOutcome(int playerTotal, int bankerTotal) {
-        if (playerTotal == 9 && bankerTotal == 9) {
-            return "Tie! Both sides have a natural 9.";
-        } else if (playerTotal == 9) {
-            return String.format("Player won with a natural 9! Player's score: 9 vs. Banker's score: %d", bankerTotal);
-        } else if (bankerTotal == 9) {
-            return String.format("Banker won with a natural 9! Banker's score: 9 vs. Player's score: %d", playerTotal);
-        } else if (playerTotal == 8 && bankerTotal == 8) {
-            return "Tie! Both sides have a natural 8.";
-        } else if (playerTotal == 8) {
-            return String.format("Player won with a natural 8! Player's score: 8 vs. Banker's score: %d", bankerTotal);
-        } else if (bankerTotal == 8) {
-            return String.format("Banker won with a natural 8! Banker's score: 8 vs. Player's score: %d", playerTotal);
-        } else if (playerTotal == bankerTotal) {
-            return String.format("Tie! Both sides score: %d", playerTotal);
-        } else if (playerTotal > bankerTotal) {
-            return String.format("Player won! Score: %d vs. Banker's score: %d", playerTotal, bankerTotal);
-        } else {
-            return String.format("Banker won! Score: %d vs. Player's score: %d", bankerTotal, playerTotal);
-        }
     }
 
     public int getChips() {
