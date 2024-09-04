@@ -153,7 +153,7 @@ public class BaccaratService {
         if (this.lastResult.contains("Tie!")) {
             handleTieResult();
         } else if (isWin && payout > 0) {
-            this.player.win(payout);
+            this.player.win(payout); // Nem szükséges a tétet újra hozzáadni, mert a payout már tartalmazza
         } else {
             // Csak a tétet vonjuk le, ha nem nyert
             this.player.lose(this.betAmount);
@@ -185,11 +185,14 @@ public class BaccaratService {
 
     private void handleTieResult() {
         if (this.betType == BetType.TIE) {
-            this.player.win(this.betAmount * 8); // Csak a nyeremény
+            // Ha TIE fogadásra tett, visszaadjuk a tétet és a nyereményt
+            this.player.win(this.betAmount + this.betAmount * 8); // Tét vissza + 8x nyeremény
         } else {
-            this.player.win(this.betAmount); // Tét visszaadás döntetlen esetén
+            // Döntetlen esetén visszaadjuk a tétet, ha nem TIE-re fogadtak
+            this.player.win(this.betAmount); // Csak a tét vissza
         }
     }
+
 
     private String determineOutcome(int playerTotal, int bankerTotal) {
         // Ellenőrizze a természetes győzelmeket és döntetleneket egyszerűbben

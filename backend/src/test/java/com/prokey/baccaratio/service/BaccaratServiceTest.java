@@ -68,8 +68,6 @@ public class BaccaratServiceTest {
     public void testBankerNaturalWinNoThirdCard() {
         baccaratService.placeBet(BaccaratService.BetType.BANKER, 10);
 
-        // Mock the draw to ensure the banker gets a natural 9 and the player gets a
-        // lower score
         when(deckMock.draw()).thenReturn(
                 new Card("Hearts", "9", 9), // Banker's first card
                 new Card("Diamonds", "Queen", 0), // Banker's second card
@@ -78,12 +76,9 @@ public class BaccaratServiceTest {
 
         String result = baccaratService.playRound();
 
-        // Check that the banker won with a natural 9 and did not draw a third card
         assertEquals("Tie! Both sides have a natural 9.", result,
                 "The game outcome should reflect a natural win for the banker with a score of 9.");
 
-        // Verify that the deck.draw() method was called exactly 4 times, ensuring no
-        // third card was drawn
         verify(deckMock, times(4)).draw();
     }
 
