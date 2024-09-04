@@ -4,6 +4,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 @Configuration
 public class CorsConfiguration implements WebMvcConfigurer {
 
@@ -13,7 +17,7 @@ public class CorsConfiguration implements WebMvcConfigurer {
         String corsOriginEnv = System.getenv("CORS_ORIGIN");
 
         // Alapértelmezett engedélyezett eredetek
-        String[] allowedOrigins = {
+        String[] defaultOrigins = {
                 "http://www.baccaratio.devma.de",
                 "https://www.baccaratio.devma.de",
                 "http://baccaratio.devma.de",
@@ -25,31 +29,20 @@ public class CorsConfiguration implements WebMvcConfigurer {
                 "http://localhost:4200"
         };
 
-        // Ha van érvényes érték a CORS_ORIGIN környezeti változóban, hozzáadjuk a
-        // listához
-        if (corsOriginEnv != null && !corsOriginEnv.isEmpty()) {
-            registry.addMapping("/**")
-                    .allowedOrigins(concatArrays(allowedOrigins, corsOriginEnv.split(","))) // Környezeti változók
-                                                                                            // hozzáadása
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                    .allowCredentials(true)
-                    .allowedHeaders("*")
-                    .maxAge(3600);
-        } else {
-            registry.addMapping("/**")
-                    .allowedOrigins(allowedOrigins)
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                    .allowCredentials(true)
-                    .allowedHeaders("*")
-                    .maxAge(3600);
-        }
-    }
+        // Engedélyezett eredetek összegyűjtése, duplikációk kiszűrésével
+        Set<String> allowedOriginsSet = new HashSet<>(Arrays.asList(defaultOrigins));
 
-    // Helper metódus tömbök összefűzésére
-    private String[] concatArrays(String[] arr1, String[] arr2) {
-        String[] result = new String[arr1.length + arr2.length];
-        System.arraycopy(arr1, 0, result, 0, arr1.length);
-        System.arraycopy(arr2, 0, result, arr1.length, arr2.length);
-        return result;
+        // Környezeti változó hozzáadása, ha van érték
+        if (corsOriginEnv != null && !corsOriginEnv.isEmpty()) {
+            allowedOriginsSet.addAll(Arrays.asList(corsOriginEnv.split(",")));
+        }
+
+        // Eredeti CORS konfiguráció a duplikációk nélkül
+        registry.addMapping("/**")
+                .allowedOrigins(allowedOriginsSet.toArray(new String[0])) // Átalakítjuk tömbbé
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowCredentials(true)
+                .allowedHeaders("*")
+                .maxAge(3600);
     }
 }
