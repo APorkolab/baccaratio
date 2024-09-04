@@ -193,39 +193,35 @@ public class BaccaratService {
         }
     }
 
-
     private String determineOutcome(int playerTotal, int bankerTotal) {
-        // Ellenőrizze a természetes győzelmeket és döntetleneket egyszerűbben
-        if (isNaturalWin(playerTotal, 9) || isNaturalWin(bankerTotal, 9) || isNaturalTie(playerTotal, bankerTotal, 9)) {
-            return handleNaturalOutcome(playerTotal, bankerTotal, 9);
+        // Ellenőrizzük először a természetes győzelmeket (8 és 9 esetén)
+        if (playerTotal >= 8 || bankerTotal >= 8) {
+            // Ha mindkét fél természetes győzelmet ért el, és ugyanannyi a pontszám, az
+            // döntetlen
+            if (playerTotal == bankerTotal) {
+                return generateTieMessage(playerTotal);
+            }
+            // Egyébként kezeljük a természetes győzelmet
+            return handleNaturalOutcome(playerTotal, bankerTotal, Math.max(playerTotal, bankerTotal));
         }
 
-        if (isNaturalWin(playerTotal, 8) || isNaturalWin(bankerTotal, 8) || isNaturalTie(playerTotal, bankerTotal, 8)) {
-            return handleNaturalOutcome(playerTotal, bankerTotal, 8);
-        }
-
+        // Ha nincs természetes győzelem, és a pontszámok egyenlőek, az döntetlen
         if (playerTotal == bankerTotal) {
             return generateTieMessage(playerTotal);
         }
+
+        // Ha nincs döntetlen, folytatódik a normál győzelem ellenőrzése
         return determineStandardWin(playerTotal, bankerTotal);
     }
 
     private String handleNaturalOutcome(int playerTotal, int bankerTotal, int naturalValue) {
-        if (isNaturalTie(playerTotal, bankerTotal, naturalValue)) {
+        if (playerTotal == bankerTotal) {
             return generateTieMessage(naturalValue);
-        } else if (isNaturalWin(playerTotal, naturalValue)) {
-            return generatePlayerWinMessage(naturalValue, bankerTotal);
+        } else if (playerTotal > bankerTotal) {
+            return generatePlayerWinMessage(playerTotal, bankerTotal);
         } else {
-            return generateBankerWinMessage(naturalValue, playerTotal);
+            return generateBankerWinMessage(bankerTotal, playerTotal);
         }
-    }
-
-    private boolean isNaturalTie(int playerTotal, int bankerTotal, int naturalValue) {
-        return playerTotal == naturalValue && bankerTotal == naturalValue;
-    }
-
-    private boolean isNaturalWin(int total, int naturalValue) {
-        return total == naturalValue;
     }
 
     private String generateTieMessage(int score) {
@@ -275,7 +271,7 @@ public class BaccaratService {
 
     private int calculateTotal(List<Card> cards) {
         int total = cards.stream().mapToInt(Card::getPoints).sum();
-        return total % 10;
+        return total % 10; // A baccarat pontszám mindig csak a végső számjegy.
     }
 
     public int getChips() {
