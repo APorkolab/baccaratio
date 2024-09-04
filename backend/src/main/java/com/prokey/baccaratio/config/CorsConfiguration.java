@@ -10,8 +10,16 @@ public class CorsConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://baccaratio.devma.de", "https://baccaratio.porkolab.hu",
-                        "http://localhost:4200")
+                .allowedOrigins(
+                        "http://www.baccaratio.devma.de",
+                        "https://www.baccaratio.devma.de",
+                        "http://baccaratio.devma.de",
+                        "https://baccaratio.devma.de",
+                        "http://www.baccaratio.porkolab.hu",
+                        "https://www.baccaratio.porkolab.hu",
+                        "http://baccaratio.porkolab.hu",
+                        "https://baccaratio.porkolab.hu",
+                        "http://localhost:4200") // Fejlesztési környezet
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowCredentials(true)
                 .allowedHeaders("*")
