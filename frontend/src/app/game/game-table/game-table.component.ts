@@ -16,6 +16,7 @@ import { environment } from 'src/environments/environment';
 })
 export class GameTableComponent implements OnInit, OnDestroy {
   apiUrl: string = environment.apiUrl;
+  playerCardsSubject: any;
 
   handleBetAmountChange(amount: number): void {
     if (this.playerStatusComponent) {
@@ -62,9 +63,11 @@ export class GameTableComponent implements OnInit, OnDestroy {
       });
     }
   }
+
   getCards(): void {
+    this.isLoading = true;
     this.gameService.getCards().subscribe({
-      next: (response: { playerCards: Card[], bankerCards: Card[] }) => {
+      next: (response) => {
         console.log('Kártyák lekérve:', response);
         this.playerCards = [];
         this.bankerCards = [];
@@ -72,21 +75,27 @@ export class GameTableComponent implements OnInit, OnDestroy {
         const allCards = [...response.playerCards, ...response.bankerCards];
         let index = 0;
 
-        const addCardInterval = setInterval(() => {
+        const addCard = () => {
           if (index < allCards.length) {
             if (index % 2 === 0) {
-              this.playerCards.push(allCards[index]);
+              this.playerCards = [...this.playerCards, allCards[index]];
+              this.updatePlayerCards(this.playerCards);
             } else {
-              this.bankerCards.push(allCards[index]);
+              this.bankerCards = [...this.bankerCards, allCards[index]];
+              this.updateBankerCards(this.bankerCards);
             }
             index++;
+            setTimeout(addCard, 500);
           } else {
-            clearInterval(addCardInterval);
+            this.isLoading = false;
           }
-        }, 500); // 500ms késleltetés minden kártya között
+        };
+
+        addCard();
       },
-      error: (error: any) => {
+      error: (error) => {
         console.error('Hiba történt a kártyák lekérése közben:', error);
+        this.isLoading = false;
       }
     });
   }
@@ -120,5 +129,13 @@ export class GameTableComponent implements OnInit, OnDestroy {
 
   hideModal(): void {
     this.showModal = false;
+  }
+
+  updatePlayerCards(cards: Card[]): void {
+    this.playerCards = cards;
+  }
+
+  updateBankerCards(cards: Card[]): void {
+    this.bankerCards = cards;
   }
 }
