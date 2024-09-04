@@ -20,6 +20,8 @@ export class GameTableComponent implements OnInit, OnDestroy {
   handleBetAmountChange(amount: number): void {
     if (this.playerStatusComponent) {
       this.playerStatusComponent.updateCurrentBetAmount(amount);
+    } else {
+      console.warn('playerStatusComponent is not initialized');
     }
   }
 
@@ -29,6 +31,8 @@ export class GameTableComponent implements OnInit, OnDestroy {
   @ViewChild(BetPanelComponent) betPanelComponent!: BetPanelComponent;
   @ViewChild(PlayerStatusComponent)
   playerStatusComponent!: PlayerStatusComponent;
+  isLoading: boolean = false;
+  showModal: boolean = false;
 
   constructor(private http: HttpClient, private gameService: GameService) { }
 
@@ -48,6 +52,9 @@ export class GameTableComponent implements OnInit, OnDestroy {
       })
     );
 
+  }
+
+  ngAfterViewInit() {
     if (this.betPanelComponent) {
       this.betPanelComponent.betPlaced.subscribe(({ type, amount }) => {
         console.log(`Fogadás megtörtént: ${type} összeggel: ${amount}`);
@@ -55,50 +62,33 @@ export class GameTableComponent implements OnInit, OnDestroy {
       });
     }
   }
-
-  ngAfterViewInit() {
-    this.betPanelComponent.betPlaced.subscribe(({ type, amount }) => {
-      console.log(`Fogadás megtörtént: ${type} összeggel: ${amount}`);
-      this.getCards();
-    });
-  }
-
   getCards(): void {
-    this.http
-      .get<{ playerCards: Card[]; bankerCards: Card[] }>(`${this.apiUrl}/cards`)
-      .subscribe(
-        (response) => {
-          this.playerCards = [];
-          this.bankerCards = [];
+    this.gameService.getCards().subscribe({
+      next: (response: { playerCards: Card[], bankerCards: Card[] }) => {
+        console.log('Kártyák lekérve:', response);
+        this.playerCards = [];
+        this.bankerCards = [];
 
-          const combinedCards = response.playerCards
-            .map((card, i) => ({ card, type: 'player', index: i * 2 }))
-            .concat(
-              response.bankerCards.map((card, i) => ({
-                card,
-                type: 'banker',
-                index: i * 2 + 1,
-              }))
-            )
-            .sort((a, b) => a.index - b.index);
+        const allCards = [...response.playerCards, ...response.bankerCards];
+        let index = 0;
 
-          from(combinedCards)
-            .pipe(concatMap((item) => from([item]).pipe(delay(500))))
-            .subscribe((item) => {
-              if (item.type === 'player') {
-                this.playerCards.push(item.card);
-              } else {
-                this.bankerCards.push(item.card);
-              }
-            });
-        },
-        (error) => {
-          console.error(
-            'There was an error retrieving the cards from the backend',
-            error
-          );
-        }
-      );
+        const addCardInterval = setInterval(() => {
+          if (index < allCards.length) {
+            if (index % 2 === 0) {
+              this.playerCards.push(allCards[index]);
+            } else {
+              this.bankerCards.push(allCards[index]);
+            }
+            index++;
+          } else {
+            clearInterval(addCardInterval);
+          }
+        }, 500); // 500ms késleltetés minden kártya között
+      },
+      error: (error: any) => {
+        console.error('Hiba történt a kártyák lekérése közben:', error);
+      }
+    });
   }
 
   getCardImage(card: Card): string {
@@ -122,5 +112,13 @@ export class GameTableComponent implements OnInit, OnDestroy {
     const suit = card.suit.toLowerCase();
     let suitName = suit;
     return `../../../assets/cards/${value}_of_${suitName}.png`;
+  }
+
+  showAuthorModal(): void {
+    this.showModal = true;
+  }
+
+  hideModal(): void {
+    this.showModal = false;
   }
 }

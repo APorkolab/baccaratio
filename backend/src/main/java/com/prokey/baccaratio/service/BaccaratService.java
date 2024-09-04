@@ -88,6 +88,8 @@ public class BaccaratService {
     private void resetRound() {
         payout = 0;
         isWin = false;
+        isBankerWin = false;
+        isTie = false;
         playerCards.clear();
         bankerCards.clear();
     }
@@ -100,48 +102,60 @@ public class BaccaratService {
     }
 
     private void drawAdditionalCards(int playerTotal, int bankerTotal) {
+        // Játékos lap húzása
         if (playerTotal <= 5) {
             playerCards.add(deck.draw());
             playerTotal = calculateTotal(playerCards);
         }
 
+        // Bankár lap húzása
         if (bankerTotal <= 5) {
-            if (playerCards.size() == 2
-                    || (playerCards.size() == 3 && shouldBankerDraw(bankerTotal, playerCards.get(2).getPoints()))) {
+            // Ha a játékos húzott harmadik lapot, ellenőrizzük a bankár húzási szabályait
+            if (playerCards.size() == 3) {
+                int playerThirdCardValue = playerCards.get(2).getPoints();
+                if (shouldBankerDraw(bankerTotal, playerThirdCardValue)) {
+                    bankerCards.add(deck.draw());
+                }
+            } else {
+                // Ha a játékos nem húzott harmadik lapot, a bankár is húz, ha <= 5 az
+                // összpontszáma
                 bankerCards.add(deck.draw());
             }
         }
     }
 
     private boolean shouldBankerDraw(int bankerTotal, int playerThirdCardValue) {
-        if (bankerTotal <= 2)
+        if (bankerTotal <= 2) {
             return true;
-        if (bankerTotal == 3 && playerThirdCardValue != 8)
+        }
+        if (bankerTotal == 3 && playerThirdCardValue != 8) {
             return true;
-        if (bankerTotal == 4 && (playerThirdCardValue >= 2 && playerThirdCardValue <= 7))
+        }
+        if (bankerTotal == 4 && (playerThirdCardValue >= 2 && playerThirdCardValue <= 7)) {
             return true;
-        if (bankerTotal == 5 && (playerThirdCardValue >= 4 && playerThirdCardValue <= 7))
+        }
+        if (bankerTotal == 5 && (playerThirdCardValue >= 4 && playerThirdCardValue <= 7)) {
             return true;
-        if (bankerTotal == 6 && (playerThirdCardValue == 6 || playerThirdCardValue == 7))
+        }
+        if (bankerTotal == 6 && (playerThirdCardValue == 6 || playerThirdCardValue == 7)) {
             return true;
+        }
         return false;
     }
 
-    public synchronized void updateChipsBasedOnResult() {
+    private void updateChipsBasedOnResult() {
         payout = calculatePayout(
                 playerCards.size() > 0 ? playerCards.get(0) : null,
                 playerCards.size() > 1 ? playerCards.get(1) : null,
                 bankerCards.size() > 0 ? bankerCards.get(0) : null,
-                bankerCards.size() > 1 ? bankerCards.get(1) : null
-        );
+                bankerCards.size() > 1 ? bankerCards.get(1) : null);
 
         if (this.lastResult.contains("Tie!")) {
-            handleTieResult();  // Kezeljük a döntetlent külön
+            handleTieResult();
         } else if (isWin && payout > 0) {
-            // Ha a játékos nyer, hozzáadjuk a tétet és a nyereményt a zsetonjaihoz
             this.player.win(payout);
         } else {
-            // Ha veszít a játékos, csak a tétet vonjuk le
+            // Csak a tétet vonjuk le, ha nem nyert
             this.player.lose(this.betAmount);
         }
     }
@@ -171,37 +185,36 @@ public class BaccaratService {
 
     private void handleTieResult() {
         if (this.betType == BetType.TIE) {
-            // Ha TIE fogadásra történt, visszaadjuk a tétet és a nyereményt
-            this.player.win(this.betAmount + this.betAmount * 8);  // Tét vissza + 8x nyeremény
+            this.player.win(this.betAmount * 8); // Csak a nyeremény
         } else {
-            // Döntetlen esetén visszaadjuk a tétet, ha nem TIE-re fogadtak
-            this.player.win(this.betAmount);
+            this.player.win(this.betAmount); // Tét visszaadás döntetlen esetén
         }
     }
 
     private String determineOutcome(int playerTotal, int bankerTotal) {
-        if (isNaturalTie(playerTotal, bankerTotal, 9)) {
-            return generateTieMessage(9);
+        // Ellenőrizze a természetes győzelmeket és döntetleneket egyszerűbben
+        if (isNaturalWin(playerTotal, 9) || isNaturalWin(bankerTotal, 9) || isNaturalTie(playerTotal, bankerTotal, 9)) {
+            return handleNaturalOutcome(playerTotal, bankerTotal, 9);
         }
-        if (isNaturalWin(playerTotal, 9)) {
-            return generatePlayerWinMessage(9, bankerTotal);
+
+        if (isNaturalWin(playerTotal, 8) || isNaturalWin(bankerTotal, 8) || isNaturalTie(playerTotal, bankerTotal, 8)) {
+            return handleNaturalOutcome(playerTotal, bankerTotal, 8);
         }
-        if (isNaturalWin(bankerTotal, 9)) {
-            return generateBankerWinMessage(9, playerTotal);
-        }
-        if (isNaturalTie(playerTotal, bankerTotal, 8)) {
-            return generateTieMessage(8);
-        }
-        if (isNaturalWin(playerTotal, 8)) {
-            return generatePlayerWinMessage(8, bankerTotal);
-        }
-        if (isNaturalWin(bankerTotal, 8)) {
-            return generateBankerWinMessage(8, playerTotal);
-        }
+
         if (playerTotal == bankerTotal) {
             return generateTieMessage(playerTotal);
         }
         return determineStandardWin(playerTotal, bankerTotal);
+    }
+
+    private String handleNaturalOutcome(int playerTotal, int bankerTotal, int naturalValue) {
+        if (isNaturalTie(playerTotal, bankerTotal, naturalValue)) {
+            return generateTieMessage(naturalValue);
+        } else if (isNaturalWin(playerTotal, naturalValue)) {
+            return generatePlayerWinMessage(naturalValue, bankerTotal);
+        } else {
+            return generateBankerWinMessage(naturalValue, playerTotal);
+        }
     }
 
     private boolean isNaturalTie(int playerTotal, int bankerTotal, int naturalValue) {
@@ -223,14 +236,16 @@ public class BaccaratService {
         isWin = true;
         isBankerWin = false;
         isTie = false;
-        return String.format("Player won with a natural %d! Player's score: %d vs. Banker's score: %d", playerScore, playerScore, bankerScore);
+        return String.format("Player won with a natural %d! Player's score: %d vs. Banker's score: %d", playerScore,
+                playerScore, bankerScore);
     }
 
     private String generateBankerWinMessage(int bankerScore, int playerScore) {
         isWin = false;
         isBankerWin = true;
         isTie = false;
-        return String.format("Banker won with a natural %d! Banker's score: %d vs. Player's score: %d", bankerScore, bankerScore, playerScore);
+        return String.format("Banker won with a natural %d! Banker's score: %d vs. Player's score: %d", bankerScore,
+                bankerScore, playerScore);
     }
 
     private String determineStandardWin(int playerTotal, int bankerTotal) {

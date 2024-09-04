@@ -8,9 +8,12 @@
 		<button *ngIf="editingName" (click)="editingName = false">Cancel</button>
 	</div>
 	<div>
+		<button class="author-button" (mouseenter)="showAuthorModal()">Szerző</button>
+	</div>
+	<div>
 		<label>Current Bet:</label>
 		<div class="current-bet-amount">
-			{{ currentBetAmount }}
+			<span>{{ currentBet }}</span>
 		</div>
 	</div>
 	<div>

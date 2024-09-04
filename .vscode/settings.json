@@ -1,4 +1,7 @@
 {
   "liveServer.settings.port": 5501,
-  "java.configuration.updateBuildConfiguration": "interactive"
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "yaml.schemas": {
+    "swaggerviewer:openapi": "file:///c%3A/Users/adamp/baccaratio/backend/src/main/resources/swagger.yaml"
+  }
 }

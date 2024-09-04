@@ -1,18 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Eagle+Lake&display=swap');
 
 body {
-  font-family: "LXGW WenKai Mono TC",
-    monospace;
+  font-family: "LXGW WenKai Mono TC", monospace;
   font-weight: 400;
   font-style: normal;
   color: #fff;
   background-color: #121212;
 }
 
+.loading-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
 .card,
 .hand-label,
 .betting-area {
   font-family: inherit;
+}
+
+.card-image{
+  
 }
 
 .game-table {
@@ -83,9 +98,7 @@ body {
 .hand {
   display: flex;
   justify-content: flex-start;
-
   align-items: flex-start;
-
   flex-wrap: nowrap;
   min-height: 125px;
   gap: 5px;
@@ -107,45 +120,76 @@ body {
   position: relative;
   transition: transform 0.3s ease;
   margin-right: 1px;
-}
+} /* Hiányzó záró elem pótlása */
 
 @keyframes slideInFromRight {
   0% {
     transform: translateX(100%);
     opacity: 0;
   }
-
   100% {
     transform: translateX(0);
     opacity: 1;
   }
 }
 
+.card-enter {
+  animation: slideInFromRight 0.5s ease-out forwards;
+}
+
+/* Mobil nézet javítása */
 @media (max-width: 767px) {
   .hand-label {
     font-size: 1.5rem;
   }
 
   .card {
-    max-width: 10rem;
-    font-size: 0.9rem;
+    max-width: 8rem; /* Kártyák méretének csökkentése mobilon */
+    font-size: 1rem;
+    margin-right: 5px; /* Kisebb margó a kártyák között */
   }
 
   .hand {
     gap: 10px;
+    justify-content: center; /* A kártyák középre igazítása */
+    flex-wrap: wrap; /* A kártyák wrap-elve jelenjenek meg mobilon */
   }
 
   .betting-area {
+    flex-direction: column;
     margin-top: 20px;
+    align-items: center;
+  }
+
+  .game-table {
+    padding-top: 20px;
   }
 }
 
+/* Tablet nézet javítása */
 @media (min-width: 768px) and (max-width: 1023px) {
+  .game-table {
+    flex-direction: column; /* Függőleges elrendezés tableten is */
+    align-items: center; /* Középre igazítás */
+  }
+
+  .hand {
+    justify-content: center; /* Kártyák középre igazítása tableten */
+    gap: 15px; /* Nagyobb hely a kártyák között */
+  }
+
   .card {
-    max-width: 12rem;
+    max-width: 12rem; /* Kártyák méretének növelése tableten */
+  }
+
+  .betting-area {
+    flex-direction: row;
+    justify-content: center; /* A betting area középre igazítása tableten */
+    margin-top: 15px;
   }
 }
 
+/* Asztali nézet */
 @media (min-width: 1024px) {
   .game-table {
     flex-direction: row;
@@ -170,9 +214,21 @@ body {
   }
 }
 
+.author-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+
+/* Az osztályok különálló definiálása */
 .ultramodern-card {
-  font-family: "Eagle Lake",
-    serif;
+  font-family: "Eagle Lake", serif;
   font-weight: 400;
   font-style: normal;
   border-radius: 15px;
@@ -181,7 +237,7 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   color: #ffffff;
   width: fit-content;
-  margin: 100px auto;
+  margin: 0 auto;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -189,10 +245,6 @@ body {
 }
 
 .ultramodern-name {
-  font-family: "Eagle Lake",
-    serif;
-  font-weight: 400;
-  font-style: normal;
   font-size: 28px;
   font-weight: 700;
   letter-spacing: 4px;
@@ -208,6 +260,7 @@ body {
   margin-bottom: 15px;
   color: #d1d1d1;
   transition: transform 0.3s ease-in-out;
+  z-index: 1001;
 }
 
 .ultramodern-info a {
@@ -215,21 +268,11 @@ body {
   text-decoration: none;
   border-bottom: 1px solid #76b2fe;
   transition: color 0.3s ease-in-out;
+  position: relative;
+  z-index: 1002;
 }
 
 .ultramodern-info a:hover {
   color: #fc466b;
   border-bottom: 1px solid #fc466b;
-}
-
-.ultramodern-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transform: rotate(30deg);
-  z-index: 0;
 }

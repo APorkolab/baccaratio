@@ -58,15 +58,16 @@ export class BetPanelComponent {
 
   doubleBet(): void {
     this.currentBetAmount *= 2;
-    this.betHistory.push(this.currentBetAmount);
     this.currentBetAmountChanged.emit(this.currentBetAmount);
   }
 
   undoLastBet(): void {
-    const lastBet = this.betHistory.pop();
-    if (lastBet) {
-      this.currentBetAmount -= lastBet;
-      this.currentBetAmountChanged.emit(this.currentBetAmount);
+    if (this.betHistory.length > 0) {
+      const lastBet = this.betHistory.pop();
+      if (lastBet) {
+        this.currentBetAmount = Math.max(0, this.currentBetAmount - lastBet);
+        this.currentBetAmountChanged.emit(this.currentBetAmount);
+      }
     }
   }
 
@@ -79,29 +80,37 @@ export class BetPanelComponent {
 
     this.loading = true;
     try {
-      const response = await firstValueFrom(
+      const betResponse = await firstValueFrom(
         this.gameService.placeBet(betType, this.currentBetAmount)
-
       );
-      setTimeout(() => {
-        alert(playResponse);
-      }, 5000);
+
+      this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
 
       const playResponse = await firstValueFrom(this.gameService.playGame());
 
-      this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
-      this.currentBetAmount = 0;
-      this.currentBetAmountChanged.emit(this.currentBetAmount);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert("You have no remaining chips or you do not have enough chips for this bet.");
-      }
+      // Késleltetjük az alertet 7 másodperccel
+      setTimeout(() => {
+        alert(playResponse);
+
+        // Frissítse az egyenleget a válasz alapján az alert után
+        this.gameService.getPlayer().subscribe(updatedPlayer => {
+          this.gameService.updateBalance(updatedPlayer.chips);
+        });
+
+        this.currentBetAmount = 0;
+        this.currentBetAmountChanged.emit(this.currentBetAmount);
+        this.betHistory = []; // Töröljük a fogadási előzményeket
+      }, 4000);
+
+    } catch (error: any) {
+      console.error('Error placing bet:', error);
+      alert(error.message || "An error occurred while placing the bet.");
     } finally {
       this.loading = false;
     }
   }
+
+
 
 
 

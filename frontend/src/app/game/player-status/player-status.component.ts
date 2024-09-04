@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { GameService } from '../game.service';
 import { Player } from 'src/app/model/player';
 import { Subscription } from 'rxjs';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-player-status',
@@ -18,16 +19,19 @@ export class PlayerStatusComponent implements OnInit, OnDestroy {
   editingBalance = false;
   currentBetAmount: number = 0;
   subscription: Subscription = new Subscription();
-
-  constructor(private gameService: GameService) { }
+  currentBet: number = 0;
+  isLoading: boolean = false;
+  constructor(private gameService: GameService, private cdr: ChangeDetectorRef, appComponent: AppComponent) { }
 
   ngOnInit(): void {
     this.getPlayer();
-    this.getPlayerName();
-    this.subscription.add(this.gameService.balance$.subscribe(newBalance => {
-      this.balance = newBalance;  // Ellenőrzés, hogy ez a sor meghívódik-e frissítéskor
-      console.log('Balance updated to:', newBalance); // Debug üzenet
-    }));
+    this.subscription.add(
+      this.gameService.balance$.subscribe(newBalance => {
+        this.balance = newBalance;
+        console.log('Egyenleg frissítve a komponensben:', newBalance); // Debug napló
+        this.cdr.detectChanges(); // Manuálisan triggereljük a változásdetektálást
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -35,7 +39,7 @@ export class PlayerStatusComponent implements OnInit, OnDestroy {
   }
 
   updateCurrentBetAmount(amount: number): void {
-    this.currentBetAmount = amount;
+    this.currentBet = amount;
   }
 
   getPlayer() {
@@ -52,27 +56,28 @@ export class PlayerStatusComponent implements OnInit, OnDestroy {
     this.gameService.updateChips(amount).subscribe({
       next: (response: Player) => {
         console.log('Chips updated:', response);
-        this.gameService.updateBalance(this.newBalance = response.chips);
+        this.balance = response.chips;
+        this.gameService.updateBalance(this.balance);
       },
       error: (error) => console.error('Error updating chips:', error),
     });
   }
 
-  updateTotalBet(betAmount: number) {
-    this.gameService.updateTotalBet(betAmount).subscribe({
-      next: (response: Player) => {
-        console.log('Total bet updated:', response);
-        this.gameService.updateBalance(this.newBalance - betAmount);
-      },
-      error: (error) => console.error('Error updating total bet:', error),
-    });
-  }
+  // updateTotalBet(betAmount: number) {
+  //   this.gameService.updateTotalBet(betAmount).subscribe({
+  //     next: (response: Player) => {
+  //       console.log('Total bet updated:', response);
+  //       this.gameService.updateBalance(this.newBalance - betAmount);
+  //     },
+  //     error: (error) => console.error('Error updating total bet:', error),
+  //   });
+  // }
 
 
-  getPlayerName() {
+  getPlayerName(): void {
     this.gameService.getPlayerName().subscribe({
       next: (response: Player) => {
-        this.playerName = response.name;
+        this.playerName = response.name ?? '';
       },
       error: (error) => console.error('Error fetching player name:', error),
     });
@@ -107,5 +112,17 @@ export class PlayerStatusComponent implements OnInit, OnDestroy {
         console.error('Hiba az egyensúly frissítése közben: ', error);
       },
     });
+  }
+
+
+  @Output() showAuthorModalEvent = new EventEmitter<void>();
+  @Output() hideAuthorModalEvent = new EventEmitter<void>();
+
+  showAuthorModal(): void {
+    this.showAuthorModalEvent.emit();
+  }
+
+  hideAuthorModal(): void {
+    this.hideAuthorModalEvent.emit();
   }
 }

@@ -1,7 +1,9 @@
-<app-player-status></app-player-status>
+<app-player-status (showAuthorModalEvent)="showModal = true"
+	(hideAuthorModalEvent)="showModal = false"></app-player-status>
 
 <div class="betting-area">
-	<app-bet-panel (currentBetAmountChanged)="handleBetAmountChange($event)"></app-bet-panel>
+	<app-bet-panel (currentBetAmountChanged)="handleBetAmountChange($event)" (showAuthorModalEvent)="showModal = true"
+		(hideAuthorModalEvent)="showModal = false"></app-bet-panel>
 </div>
 
 <div class="labels-container">
@@ -15,6 +17,9 @@
 				<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
 			</div>
 		</div>
+		<div *ngIf="isLoading" class="loading-indicator">
+			Eredmény kiszámítása...
+		</div>
 	</div>
 
 	<div class="hand-container banker-hand">
@@ -26,14 +31,13 @@
 	</div>
 </div>
 
-<div class="ultramodern-card">
-	<div class="ultramodern-name">Dr. Porkoláb Ádám</div>
-	<div class="ultramodern-info">📧 Email: <a
-			href="&#109;a&#105;l&#116;&#111;:&#97;&#100;&#97;&#109;&#64;&#112;&#111;&#114;&#107;&#111;&#108;&#97;&#98;&#46;&#104;&#117;">Ide
-			írhatsz!</a></div>
-	<div class="ultramodern-info">🌐 Weboldal: <a href="https://www.adamporkolab.hu"
-			target="_blank">https://www.adamporkolab.hu</a></div>
-	<div class="ultramodern-info">🐙 GitHub: <a href="https://github.com/APorkolab"
-			target="_blank">https://github.com/APorkolab</a>
+<div class="author-modal" *ngIf="showModal" (mouseleave)="hideModal()">
+	<div class="ultramodern-card">
+		<div class="ultramodern-name">Dr. Porkoláb Ádám</div>
+		<div class="ultramodern-info">📧 Email: <a href="mailto:adam@porkolab.hu" target="_blank">Ide írhatsz!</a></div>
+		<div class="ultramodern-info">🌐 Weboldal: <a href="https://www.adamporkolab.hu"
+				target="_blank">https://www.adamporkolab.hu</a></div>
+		<div class="ultramodern-info">🐙 GitHub: <a href="https://github.com/APorkolab"
+				target="_blank">https://github.com/APorkolab</a></div>
 	</div>
 </div>

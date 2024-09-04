@@ -7,4 +7,13 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Baccaratio';
+  showModal: boolean = false;
+
+  showAuthorModal(): void {
+    this.showModal = true;
+  }
+
+  hideModal(): void {
+    this.showModal = false;
+  }
 }
