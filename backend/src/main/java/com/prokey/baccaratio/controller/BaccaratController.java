@@ -85,9 +85,12 @@ public class BaccaratController {
     @PostMapping("/player/chips")
     public ResponseEntity<?> updateChips(@RequestBody Map<String, Integer> chipsUpdate) {
         int amount = chipsUpdate.getOrDefault("amount", 0);
-        boolean updated = baccaratService.updateChips(amount);
-        return updated ? ResponseEntity.ok(Map.of("message", "Chips updated successfully."))
-                : ResponseEntity.badRequest().body(Map.of("message", "Failed to update chips."));
+        Player updatedPlayer = baccaratService.updatePlayerChips(amount);
+        if (updatedPlayer != null) {
+            return ResponseEntity.ok(Map.of("message", "Zsetonok sikeresen frissítve.", "chips", updatedPlayer.getChips()));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "Nem sikerült frissíteni a zsetonokat."));
+        }
     }
 
     @GetMapping("/player/name")

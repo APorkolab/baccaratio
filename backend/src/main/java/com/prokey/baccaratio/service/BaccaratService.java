@@ -305,6 +305,17 @@ public class BaccaratService {
         return false;
     }
 
+    public Player updatePlayerChips(int amount) {
+        if (player != null) {
+            int newChips = player.getChips() + amount;
+            if (newChips >= 0) {
+                player.setChips(newChips);
+                return player;
+            }
+        }
+        return null;
+    }
+
     public boolean isValidType(String type) {
         return Deck.isValidBetType(type);
     }

@@ -11,33 +11,35 @@
 	<div class="hand-label banker">Banker</div>
 </div>
 <div class="game-table">
-	<div class="hand-container player-hand">
-		<div class="hand">
-			<div *ngFor="let card of playerCards" class="card">
-				<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
+	<div class="game-table">
+		<div class="hand-container player-hand">
+			<div class="hand">
+				<div *ngFor="let card of playerCards" class="card">
+					<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
+				</div>
 			</div>
 		</div>
+
 		<div *ngIf="isLoading" class="loading-indicator">
 			Eredmény kiszámítása...
 		</div>
-	</div>
 
-	<div class="hand-container banker-hand">
-		<div class="hand">
-			<div *ngFor="let card of bankerCards" class="card">
-				<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
+		<div class="hand-container banker-hand">
+			<div class="hand">
+				<div *ngFor="let card of bankerCards" class="card">
+					<img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-<div class="author-modal" *ngIf="showModal" (mouseleave)="hideModal()">
-	<div class="ultramodern-card">
-		<div class="ultramodern-name">Dr. Porkoláb Ádám</div>
-		<div class="ultramodern-info">📧 Email: <a href="mailto:adam@porkolab.hu" target="_blank">Ide írhatsz!</a></div>
-		<div class="ultramodern-info">🌐 Weboldal: <a href="https://www.adamporkolab.hu"
-				target="_blank">https://www.adamporkolab.hu</a></div>
-		<div class="ultramodern-info">🐙 GitHub: <a href="https://github.com/APorkolab"
-				target="_blank">https://github.com/APorkolab</a></div>
+	<div class="author-modal" *ngIf="showModal" (mouseleave)="hideModal()">
+		<div class="ultramodern-card">
+			<div class="ultramodern-name">Dr. Porkoláb Ádám</div>
+			<div class="ultramodern-info">📧 Email: <a href="mailto:adam@porkolab.hu" target="_blank">Ide írhatsz!</a></div>
+			<div class="ultramodern-info">🌐 Weboldal: <a href="https://www.adamporkolab.hu"
+					target="_blank">https://www.adamporkolab.hu</a></div>
+			<div class="ultramodern-info">🐙 GitHub: <a href="https://github.com/APorkolab"
+					target="_blank">https://github.com/APorkolab</a></div>
+		</div>
 	</div>
-</div>

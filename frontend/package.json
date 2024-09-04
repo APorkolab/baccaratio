@@ -8,7 +8,8 @@
   "scripts": {
     "ng": "ng",
     "start": "npx serve -s dist/baccaratio",
-    "build": "ng build --configuration=production",
+    "build": "ng build --configuration=production --extra-webpack-config webpack.config.js",
+    "postinstall": "npm run build",
     "watch": "ng build --watch --configuration=development",
     "test": "ng test"
   },
@@ -25,7 +26,10 @@
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
     "baccaratio": "file:",
+    "dotenv": "^16.4.5",
+    "dotenv-webpack": "^8.1.0",
     "rxjs": "~7.8.1",
+    "serve": "^14.0.1",
     "tslib": "^2.6.3",
     "zone.js": "~0.14.10"
   },
@@ -40,6 +44,7 @@
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "ngx-build-plus": "^18.0.0",
     "typescript": "~5.5.4"
   }
 }

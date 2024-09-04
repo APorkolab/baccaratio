@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { GameService } from '../game.service';
 import { firstValueFrom } from 'rxjs';
+import { Card } from 'src/app/model/card';
 interface Chip {
   value: number;
   label: string;
@@ -80,41 +81,49 @@ export class BetPanelComponent {
 
     this.loading = true;
     try {
-      const betResponse = await firstValueFrom(
-        this.gameService.placeBet(betType, this.currentBetAmount)
-      );
-
+      await firstValueFrom(this.gameService.placeBet(betType, this.currentBetAmount));
       this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
+      const gameResponse = await firstValueFrom(this.gameService.playGame());
 
-      const playResponse = await firstValueFrom(this.gameService.playGame());
-
-      // Késleltetjük az alertet 7 másodperccel
       setTimeout(() => {
-        alert(playResponse);
-
-        // Frissítse az egyenleget a válasz alapján az alert után
-        this.gameService.getPlayer().subscribe(updatedPlayer => {
-          this.gameService.updateBalance(updatedPlayer.chips);
-        });
-
         this.currentBetAmount = 0;
         this.currentBetAmountChanged.emit(this.currentBetAmount);
-        this.betHistory = []; // Töröljük a fogadási előzményeket
-      }, 4000);
+        this.betHistory = [];
+        alert(gameResponse.result);
+      }, 7000);
 
+      this.animateCards(gameResponse.cards.playerCards, gameResponse.cards.bankerCards);
+      this.gameService.getPlayer().subscribe(updatedPlayer => {
+        this.gameService.updateBalance(updatedPlayer.chips);
+      });
     } catch (error: any) {
-      console.error('Error placing bet:', error);
-      alert(error.message || "An error occurred while placing the bet.");
+      console.error('Error during bet or game play:', error);
+      alert(error.message || "An error occurred during the bet or game.");
     } finally {
       this.loading = false;
     }
   }
 
+  animateCards(playerCards: Card[], bankerCards: Card[]) {
+    this.gameService.updateCards([], []); // Töröljük az aktuális kártyákat
+    let playerIndex = 0;
+    let bankerIndex = 0;
 
+    const interval = setInterval(() => {
+      // Játékos kártyák beúsztatása egyesével
+      if (playerIndex < playerCards.length) {
+        this.gameService.updatePlayerCards(playerCards[playerIndex]);
+        playerIndex++;
+      } else if (bankerIndex < bankerCards.length) {
+        // Bankár kártyák beúsztatása a játékos kártyák után
+        this.gameService.updateBankerCards(bankerCards[bankerIndex]);
+        bankerIndex++;
+      }
 
-
-
-
-
-
+      // Ha minden kártya kiosztásra került, leállítjuk az intervallumot
+      if (playerIndex === playerCards.length && bankerIndex === bankerCards.length) {
+        clearInterval(interval);
+      }
+    }, 1000); // 1 másodperces intervallum, hogy a kártyák egymás után jelenjenek meg
+  }
 }

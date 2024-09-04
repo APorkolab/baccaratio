@@ -1,4 +1,4 @@
 export const environment = {
 	production: true,
-	apiUrl: 'https://api.baccaratio.porkolab.hu',
+	apiUrl: process.env["API_BASE_URL"] || 'https://api.baccaratio.porkolab.hu',
 };
