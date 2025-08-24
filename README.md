@@ -1,4 +1,12 @@
-# Baccaratio v.1.0.0 documentation
+# Baccaratio v.1.0.0
+
+[![Build](https://img.shields.io/github/actions/workflow/status/APorkolab/baccaratio/ci.yml?branch=main)](../../actions)
+[![License](https://img.shields.io/badge/license-MIT-informational.svg)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/APorkolab/baccaratio.svg)](../../issues)
+[![Live Demo](https://img.shields.io/badge/live-baccaratio.porkolab.hu-success)](https://baccaratio.porkolab.hu/)
+
+
+# Documentation
 
 ## Overview
 
