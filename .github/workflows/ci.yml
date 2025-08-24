@@ -204,6 +204,14 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
 
+          # Temporarily remove ngx-build-plus if it exists
+          HAS_NGX_BUILD_PLUS="false"
+          if node -p "require('./package.json').devDependencies['ngx-build-plus']"; then
+            echo "Temporarily removing ngx-build-plus to prevent conflicts..."
+            HAS_NGX_BUILD_PLUS="true"
+            npm uninstall ngx-build-plus
+          fi
+
           LATEST_MAJ=$(npm view @angular/core version | sed 's/\..*//')
           echo "Latest available major version is ${LATEST_MAJ}"
           
@@ -222,13 +230,7 @@ jobs:
             NEXT_MAJ=$((CURRENT_MAJ + 1))
             echo "Upgrading from v${CURRENT_MAJ} to v${NEXT_MAJ}..."
 
-            # Also update ngx-build-plus if it exists, as it's tightly coupled
-            if node -p "require('./package.json').devDependencies['ngx-build-plus']"; then
-              echo "Updating ngx-build-plus as well..."
-              npx ng update @angular/cli@${NEXT_MAJ} @angular/core@${NEXT_MAJ} ngx-build-plus --force --allow-dirty
-            else
-              npx ng update @angular/cli@${NEXT_MAJ} @angular/core@${NEXT_MAJ} --force --allow-dirty
-            fi
+            npx ng update @angular/cli@${NEXT_MAJ} @angular/core@${NEXT_MAJ} --force --allow-dirty
             
             # Check if ng update failed
             if [ $? -ne 0 ]; then
@@ -238,6 +240,12 @@ jobs:
 
             echo "Successfully upgraded to v${NEXT_MAJ}."
           done
+
+          # Reinstall ngx-build-plus if it was present
+          if [ "$HAS_NGX_BUILD_PLUS" = "true" ]; then
+            echo "Reinstalling the latest compatible version of ngx-build-plus..."
+            npm install -D ngx-build-plus@latest
+          fi
 
           # Set the final version for the PR title
           FINAL_VER=$(node -p "require('./node_modules/@angular/core/package.json').version")
