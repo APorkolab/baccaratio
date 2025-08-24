@@ -150,7 +150,6 @@ jobs:
       - name: Install deps (tolerant)
         run: |
           cd "${{ needs.detect-paths.outputs.FRONT_DIR }}"
-          npm install @angular-devkit/core --save-dev
           npm install --legacy-peer-deps
       
       - name: Check if Angular upgrade is needed
