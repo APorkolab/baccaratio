@@ -8,11 +8,14 @@ import { GameService } from '../game.service';
 import { from } from 'rxjs';
 import { concatMap, delay, take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-game-table',
   templateUrl: './game-table.component.html',
   styleUrls: ['./game-table.component.scss'],
+  standalone: true,
+  imports: [CommonModule, PlayerStatusComponent, BetPanelComponent],
 })
 export class GameTableComponent implements OnInit, OnDestroy {
   apiUrl: string = environment.apiUrl;

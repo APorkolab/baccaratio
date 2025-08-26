@@ -2,12 +2,15 @@ import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output }
 import { GameService } from '../game.service';
 import { Player } from 'src/app/model/player';
 import { Subscription } from 'rxjs';
-import { AppComponent } from 'src/app/app.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-player-status',
   templateUrl: './player-status.component.html',
   styleUrls: ['./player-status.component.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
 })
 export class PlayerStatusComponent implements OnInit, OnDestroy {
   balance: number = 1000;
@@ -21,7 +24,7 @@ export class PlayerStatusComponent implements OnInit, OnDestroy {
   subscription: Subscription = new Subscription();
   currentBet: number = 0;
   isLoading: boolean = false;
-  constructor(private gameService: GameService, private cdr: ChangeDetectorRef, appComponent: AppComponent) { }
+  constructor(private gameService: GameService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.getPlayer();
