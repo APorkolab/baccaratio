@@ -34,6 +34,9 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "webpack": "^5",
+    "webpack-merge": "^5",
+    "@types/webpack": "^5",
     "@angular-devkit/build-angular": "^20.1.5",
     "@angular/cli": "^20.1.5",
     "@angular/compiler-cli": "~20.1.5",

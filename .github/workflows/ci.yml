@@ -140,28 +140,41 @@ jobs:
     needs: [detect-paths]
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_dispatch' && needs.detect-paths.outputs.FRONT_DIR != '' }}
+    defaults:
+      run:
+        working-directory: ${{ needs.detect-paths.outputs.FRONT_DIR }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
           cache-dependency-path: ${{ needs.detect-paths.outputs.FRONT_DIR }}/package-lock.json
-      - name: Install deps (tolerant)
+
+      # Mindig tiszta, reprodukálható telepítés + devDependencies
+      - name: Install dependencies (ci + dev)
         run: |
-          cd "${{ needs.detect-paths.outputs.FRONT_DIR }}"
-          npm install --legacy-peer-deps
-      
+          npm ci --include=dev || npm ci --legacy-peer-deps --include=dev
+
+      # Toolchain guard: ha a lock/dep-list nem hozza, pótoljuk a webpack láncot
+      - name: Ensure build toolchain (webpack for ngx-build-plus)
+        run: |
+          set -e
+          npm ls webpack >/dev/null 2>&1 || npm i -D webpack@^5 webpack-merge@^5 @types/webpack@^5
+          # ha saját loader/plugin kell a webpack.config.js-ben, itt lehet pótolni: npm i -D <loader/plugin>
+
       - name: Check if Angular upgrade is needed
         id: check_upgrade
         if: ${{ needs.detect-paths.outputs.FRONT_IS_ANGULAR == 'true' }}
+        env:
+          NPM_CONFIG_FUND: "false"
         run: |
-          cd "${{ needs.detect-paths.outputs.FRONT_DIR }}"
           echo "Checking for potential Angular version mismatch..."
           LATEST_MAJ=$(npm view @angular/core version | sed 's/\..*//')
           CURRENT_VER=$(node -p "require('./node_modules/@angular/core/package.json').version")
           CURRENT_MAJ=$(echo "$CURRENT_VER" | sed -E 's/\..*//')
-          
+
           if [ "$CURRENT_MAJ" -lt "$LATEST_MAJ" ]; then
             echo "UPGRADE_NEEDED=true" >> $GITHUB_OUTPUT
             echo "::warning::Angular upgrade needed from v${CURRENT_MAJ} to v${LATEST_MAJ}. Skipping build and tests. Please run the 'Tool – Angular Full Upgrade PR (Iterative)' workflow."
@@ -169,16 +182,31 @@ jobs:
             echo "UPGRADE_NEEDED=false" >> $GITHUB_OUTPUT
             echo "Angular version is up to date."
           fi
+      - name: Create .env from GitHub Secrets
+        working-directory: ${{ needs.detect-paths.outputs.FRONT_DIR }}
+        run: |
+          {
+            echo "API_URL=${API_URL}"
+            echo "NG_ENV=production"
+            # adj hozzá, ami kell még:
+            # echo "SOME_KEY=${SOME_KEY}"
+          } > .env
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          # SOME_KEY: ${{ secrets.SOME_KEY }}
 
       - name: Build (Angular or generic)
         if: ${{ steps.check_upgrade.outputs.UPGRADE_NEEDED != 'true' }}
+        env:
+          CI: "true"
         run: |
-          cd "${{ needs.detect-paths.outputs.FRONT_DIR }}"
           npm run build --if-present
+
       - name: Optional tests (best-effort)
         if: ${{ steps.check_upgrade.outputs.UPGRADE_NEEDED != 'true' }}
+        env:
+          CI: "true"
         run: |
-          cd "${{ needs.detect-paths.outputs.FRONT_DIR }}"
           npm run test --if-present -- --watch=false --browsers=ChromeHeadless --no-sandbox || echo "Skipping tests."
 
   # =============== TOOL: Manual Angular Full Upgrade PR ===============
@@ -187,39 +215,41 @@ jobs:
     needs: [detect-paths]
     if: ${{ github.event_name == 'workflow_dispatch' && needs.detect-paths.outputs.FRONT_DIR != '' && needs.detect-paths.outputs.FRONT_IS_ANGULAR == 'true' }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ needs.detect-paths.outputs.FRONT_DIR }}
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      
+
+      - name: Clean install (dev deps included)
+        run: |
+          rm -rf node_modules package-lock.json
+          npm ci --include=dev || npm ci --legacy-peer-deps --include=dev
+
+      - name: Temporarily remove ngx-build-plus (if present)
+        id: maybe_remove_ngxbp
+        run: |
+          if node -p "require('./package.json').devDependencies?.['ngx-build-plus'] || require('./package.json').dependencies?.['ngx-build-plus']" >/dev/null 2>&1; then
+            echo "HAS_NGX_BUILD_PLUS=true" >> $GITHUB_OUTPUT
+            npm uninstall ngx-build-plus
+          else
+            echo "HAS_NGX_BUILD_PLUS=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Iteratively upgrade Angular to latest
         id: upgrade_loop
         run: |
-          cd "${{ needs.detect-paths.outputs.FRONT_DIR }}"
-          
-          # Start from a very clean state to avoid conflicts from a bad lock file
-          echo "Starting from a clean slate..."
-          rm -rf node_modules package-lock.json
-          npm install --legacy-peer-deps
-
-          # Temporarily remove ngx-build-plus if it exists
-          HAS_NGX_BUILD_PLUS="false"
-          if node -p "require('./package.json').devDependencies['ngx-build-plus']"; then
-            echo "Temporarily removing ngx-build-plus to prevent conflicts..."
-            HAS_NGX_BUILD_PLUS="true"
-            npm uninstall ngx-build-plus
-          fi
-
           LATEST_MAJ=$(npm view @angular/core version | sed 's/\..*//')
           echo "Latest available major version is ${LATEST_MAJ}"
-          
+
           while true; do
-            # Reliably get current major version from the installed package
             CURRENT_VER=$(node -p "require('./node_modules/@angular/core/package.json').version")
             CURRENT_MAJ=$(echo "$CURRENT_VER" | sed -E 's/\..*//')
-            
             echo "Current major version: ${CURRENT_MAJ}"
 
             if [ "$CURRENT_MAJ" -ge "$LATEST_MAJ" ]; then
@@ -230,47 +260,40 @@ jobs:
             NEXT_MAJ=$((CURRENT_MAJ + 1))
             echo "Upgrading from v${CURRENT_MAJ} to v${NEXT_MAJ}..."
 
-            npx ng update @angular/cli@${NEXT_MAJ} @angular/core@${NEXT_MAJ} --force --allow-dirty
-            
-            # Check if ng update failed
-            if [ $? -ne 0 ]; then
-              echo "ng update to v${NEXT_MAJ} failed. Stopping."
-              exit 1
-            fi
-
-            echo "Successfully upgraded to v${NEXT_MAJ}."
+            npx -y @angular/cli@${NEXT_MAJ} update @angular/cli@${NEXT_MAJ} @angular/core@${NEXT_MAJ} --force --allow-dirty
           done
 
-          # Reinstall ngx-build-plus if it was present
-          if [ "$HAS_NGX_BUILD_PLUS" = "true" ]; then
-            echo "Reinstalling the latest compatible version of ngx-build-plus..."
-            npm install -D ngx-build-plus@latest
-          fi
-          
-          # FINAL FIX: Explicitly install @angular-devkit/core to ensure it's available for ngx-build-plus
-          echo "Ensuring @angular-devkit/core is installed..."
-          npm install -D @angular-devkit/core@latest
+      - name: Reinstall ngx-build-plus if it existed
+        if: ${{ steps.maybe_remove_ngxbp.outputs.HAS_NGX_BUILD_PLUS == 'true' }}
+        run: |
+          npm i -D ngx-build-plus@latest
 
-          # Set the final version for the PR title
+      - name: Ensure devkit core and webpack present
+        run: |
+          npm ls @angular-devkit/core >/dev/null 2>&1 || npm i -D @angular-devkit/core@latest
+          npm ls webpack >/dev/null 2>&1 || npm i -D webpack@^5 webpack-merge@^5 @types/webpack@^5
+
+      - name: Set final Angular version output
+        id: finalver
+        run: |
           FINAL_VER=$(node -p "require('./node_modules/@angular/core/package.json').version")
           echo "FINAL_VER=${FINAL_VER}" >> $GITHUB_OUTPUT
 
       - name: Create PR
-        id: cpr
         if: ${{ always() && steps.upgrade_loop.outcome == 'success' }}
         uses: peter-evans/create-pull-request@v6
         with:
           base: ${{ github.event.repository.default_branch }}
           branch: chore/angular-full-upgrade
-          title: "chore(frontend): upgrade Angular to latest (v${{ steps.upgrade_loop.outputs.FINAL_VER }})"
+          title: "chore(frontend): upgrade Angular to latest (v${{ steps.finalver.outputs.FINAL_VER }})"
           commit-message: "chore(frontend): iteratively upgrade Angular to latest version"
           body: |
-            Automated iterative Angular upgrade to v${{ steps.upgrade_loop.outputs.FINAL_VER }} in `${{ needs.detect-paths.outputs.FRONT_DIR }}`.
+            Automated iterative Angular upgrade to v${{ steps.finalver.outputs.FINAL_VER }} in `${{ needs.detect-paths.outputs.FRONT_DIR }}`.
 
             This PR was generated by the 'Angular Full Upgrade' tool. The CI process running on this PR will verify the build and test status. Manual code adjustments may be required.
           labels: dependencies, angular
-      
+
       - name: Output PR URL
-        if: ${{ always() && steps.cpr.outputs.pull-request-url != '' }}
+        if: ${{ always() && steps.create-pull-request.outputs.pull-request-url != '' }}
         run: |
-          echo "::notice title=Pull Request Created!::${{ steps.cpr.outputs.pull-request-url }}"
+          echo "::notice title=Pull Request Created!::${{ steps.create-pull-request.outputs['pull-request-url'] }}"
