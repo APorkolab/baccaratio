@@ -2,6 +2,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { GameService } from '../game.service';
 import { firstValueFrom } from 'rxjs';
 import { Card } from 'src/app/model/card';
+import { CommonModule } from '@angular/common';
+
 interface Chip {
   value: number;
   label: string;
@@ -15,6 +17,8 @@ interface BetOption {
   selector: 'app-bet-panel',
   templateUrl: './bet-panel.component.html',
   styleUrls: ['./bet-panel.component.scss'],
+  standalone: true,
+  imports: [CommonModule],
 })
 export class BetPanelComponent {
   chips: Chip[] = [

@@ -1,3 +1,6 @@
+@use 'sass:list';
+@use 'sass:color';
+
 $background-blue: #03406a;
 $background-red: #8b0000;
 $background-green: #228b22;
@@ -32,9 +35,9 @@ $chip-colors: (#205f88, #f7e50f, #2a8fbd, #f72f2f, #2abf5b);
       font-weight: bold;
       cursor: pointer;
 
-      @for $i from 1 through length($chip-colors) {
+      @for $i from 1 through list.length($chip-colors) {
         &:nth-child(#{$i}) {
-          background-color: nth($chip-colors, $i);
+          background-color: list.nth($chip-colors, $i);
         }
       }
     }
@@ -102,7 +105,7 @@ $chip-colors: (#205f88, #f7e50f, #2a8fbd, #f72f2f, #2abf5b);
       width: 80%;
 
       &:hover {
-        background-color: lighten($dark-gray, 10%);
+        background-color: color.adjust($dark-gray, $lightness: 10%);
       }
     }
   }
