@@ -2,7 +2,7 @@
   "name": "baccaratio",
   "version": "1.0.0",
   "engines": {
-    "node": "20.x",
+    "node": ">=20 <23",
     "npm": "10.x"
   },
   "scripts": {
