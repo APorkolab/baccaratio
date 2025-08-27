@@ -1,4 +1,4 @@
-# Baccaratio v.1.0.0
+# Baccaratio v.1.2.0
 
 [![Build](https://img.shields.io/github/actions/workflow/status/APorkolab/baccaratio/ci.yml?branch=main)](../../actions)
 [![License](https://img.shields.io/badge/license-MIT-informational.svg)](LICENSE)
