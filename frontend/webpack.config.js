@@ -1,14 +1,25 @@
-const webpack = require('webpack');
-const Dotenv = require('dotenv-webpack');
+/* eslint-disable @typescript-eslint/no-var-requires */
+const webpack = require("webpack");
+const fs = require("fs");
+const path = require("path");
 
-module.exports = {
-  plugins: [
-    new Dotenv({
-      path: './.env', // .env fájl elérési útja
-      systemvars: true,
-    }),
+const envPath = path.resolve(__dirname, ".env");
+
+// Töltsd be a .env-et, ha létezik; ha nem, marad üres objektum.
+let injectedEnv = {};
+if (fs.existsSync(envPath)) {
+  require("dotenv").config({ path: envPath });
+  injectedEnv = process.env;
+}
+
+// ngx-build-plus: funkciót exportálunk, hogy a meglévő confighoz hozzáadjuk a plugint
+module.exports = (config) => {
+  config.plugins = config.plugins || [];
+  config.plugins.push(
     new webpack.DefinePlugin({
-      API_BASE_URL: JSON.stringify(process.env.API_BASE_URL || 'https://api.baccaratio.porkolab.hu')
-    })
-  ]
+      // csak azt injektáljuk, ami a .env-ben (vagy a folyamatban) van; üresen is működik
+      "process.env": JSON.stringify(injectedEnv),
+    }),
+  );
+  return config;
 };
