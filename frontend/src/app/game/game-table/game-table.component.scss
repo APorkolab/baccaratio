@@ -1,278 +1,79 @@
-@import url('https://fonts.googleapis.com/css2?family=Eagle+Lake&display=swap');
-
-body {
-  font-family: "LXGW WenKai Mono TC", monospace;
-  font-weight: 400;
-  font-style: normal;
-  color: #fff;
-  background-color: #121212;
-}
-
-.loading-indicator {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.5rem;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.7);
+.game-table-container {
   padding: 1rem;
-  border-radius: 0.5rem;
-}
-
-.card,
-.hand-label,
-.betting-area {
-  font-family: inherit;
-}
-
-.card-image{
-
-}
-
-.game-table {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  background-color: #121212;
-  min-height: 35rem;
-  width: 100%;
-  padding-top: 10px;
-  position: relative;
-}
-
-.labels-container,
-.player-labels-container,
-.banker-labels-container {
-  text-align: center;
-  width: 100%;
-  position: relative;
+  background-color: var(--background-panel);
+  border-radius: 8px;
+  margin: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .labels-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   width: 100%;
-  margin-bottom: 10px;
+  padding: 0 1rem 1rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .hand-label {
-  background: #383434;
-  font-size: 2rem;
-  font-weight: bold;
-  color: #ffd700;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  border-bottom: 2px solid #ffd700;
-  padding-bottom: 0.5rem;
-  flex-basis: 33.333%;
-  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
 }
 
-.hand-label.player {
-  margin-right: auto;
-  margin-left: 0;
-}
-
-.hand-label.banker {
-  margin-left: auto;
-  margin-right: 0;
+.hands-wrapper {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 1.5rem;
+  gap: 2rem;
 }
 
 .hand-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  position: relative;
-}
-
-.betting-area {
-  display: flex;
-  justify-content: center;
-  position: relative;
-  width: 100%;
-  z-index: 2;
+  gap: 1rem;
 }
 
 .hand {
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  flex-wrap: nowrap;
-  min-height: 125px;
-  gap: 5px;
+  gap: 1rem;
+  min-height: 150px; /* Keep height consistent */
 }
 
-.card {
-  animation: slideInFromRight 0.5s ease-out;
-  width: auto;
-  max-width: 14rem;
+.card-image {
+  width: 100px;
   height: auto;
-  aspect-ratio: 3 / 4;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: white;
-  font-size: 1rem;
-  position: relative;
-  transition: transform 0.3s ease;
-  margin-right: 1px;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-@keyframes slideInFromRight {
-  0% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.card-enter {
-  animation: slideInFromRight 0.5s ease-out forwards;
-}
-
-/* Mobil nézet javítása */
-@media (max-width: 767px) {
-  .hand-label {
+.loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     font-size: 1.5rem;
-  }
+    color: white;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
 
-  .card {
-    max-width: 8rem; /* Kártyák méretének csökkentése mobilon */
-    font-size: 1rem;
-    margin-right: 5px; /* Kisebb margó a kártyák között */
-  }
-
-  .hand {
-    gap: 10px;
-    justify-content: center; /* A kártyák középre igazítása */
-    flex-wrap: wrap; /* A kártyák wrap-elve jelenjenek meg mobilon */
-  }
-
-  .betting-area {
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .hands-wrapper {
     flex-direction: column;
-    margin-top: 20px;
     align-items: center;
   }
 
-  .game-table {
-    padding-top: 20px;
-  }
-}
-
-/* Tablet nézet javítása */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .game-table {
-    flex-direction: column; /* Függőleges elrendezés tableten is */
-    align-items: center; /* Középre igazítás */
-  }
-
   .hand {
-    justify-content: center; /* Kártyák középre igazítása tableten */
-    gap: 15px; /* Nagyobb hely a kártyák között */
+    min-height: auto;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .card {
-    max-width: 12rem; /* Kártyák méretének növelése tableten */
+  .card-image {
+    width: 80px;
   }
-
-  .betting-area {
-    flex-direction: row;
-    justify-content: center; /* A betting area középre igazítása tableten */
-    margin-top: 15px;
-  }
-}
-
-/* Asztali nézet */
-@media (min-width: 1024px) {
-  .game-table {
-    flex-direction: row;
-    justify-content: space-around;
-  }
-
-  .hand-container {
-    position: relative;
-  }
-
-  .hand-container.player-hand {
-    right: -2%;
-  }
-
-  .card:nth-child(3) {
-    z-index: 0;
-    transform: rotate(90deg);
-    position: relative;
-    top: 50%;
-    left: 8%;
-    transform-origin: center;
-  }
-}
-
-.author-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
-  z-index: 1000;
-}
-
-/* Az osztályok különálló definiálása */
-.ultramodern-card {
-  font-family: "Eagle Lake", serif;
-  font-weight: 400;
-  font-style: normal;
-  border-radius: 15px;
-  padding: 30px;
-  background: linear-gradient(145deg, #820263, #291720);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  color: #ffffff;
-  width: fit-content;
-  margin: 0 auto;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  transform: perspective(1000px) rotateY(15deg);
-}
-
-.ultramodern-name {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  margin-bottom: 15px;
-  background: linear-gradient(90deg, #F75C03, #D90368);
-  -webkit-background-clip: text;
-  color: transparent;
-  transform: skewX(-5deg);
-}
-
-.ultramodern-info {
-  font-size: 18px;
-  margin-bottom: 15px;
-  color: #d1d1d1;
-  transition: transform 0.3s ease-in-out;
-  z-index: 1001;
-}
-
-.ultramodern-info a {
-  color: #76b2fe;
-  text-decoration: none;
-  border-bottom: 1px solid #76b2fe;
-  transition: color 0.3s ease-in-out;
-  position: relative;
-  z-index: 1002;
-}
-
-.ultramodern-info a:hover {
-  color: #fc466b;
-  border-bottom: 1px solid #fc466b;
 }

@@ -1,140 +1,118 @@
-@use 'sass:list';
-@use 'sass:color';
+:host {
+  width: 100%;
+}
 
-$background-blue: #03406a;
-$background-red: #8b0000;
-$background-green: #228b22;
-$light-gray: #ccc;
-$dark-gray: #333;
-$font-stack: "Playfair Display",
-serif;
-$chip-colors: (#205f88, #f7e50f, #2a8fbd, #f72f2f, #2abf5b);
+.bet-panel-container {
+  padding: 1rem;
+  background-color: var(--background-panel);
+  border-radius: 8px;
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
 
-.bet-panel {
+.chips-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  border: 2px solid transparent;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: #34495e;
+  color: var(--text-light);
+
+  &.selected {
+    border-color: var(--primary-accent);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px var(--primary-accent);
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+}
+
+.bet-options-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  font-family: $font-stack;
+  gap: 1rem;
+}
 
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 20px;
+.bet-option-button {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-light);
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
 
-    .chip {
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 5px;
-      color: $dark-gray;
-      font-weight: bold;
-      cursor: pointer;
-
-      @for $i from 1 through list.length($chip-colors) {
-        &:nth-child(#{$i}) {
-          background-color: list.nth($chip-colors, $i);
-        }
-      }
-    }
+  .label {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
   }
 
-  .bet-options {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    font-family: $font-stack;
-
-    button {
-      margin: 0.5rem;
-      padding: 1rem 2rem;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-
-      &:hover {
-        opacity: 0.8;
-      }
-
-      &.btn-primary {
-        background-color: $background-blue;
-      }
-
-      &.btn-danger {
-        background-color: $background-red;
-      }
-
-      &.btn-success {
-        background-color: $background-green;
-      }
-
-      span.label {
-        display: block;
-        margin-bottom: 5px;
-      }
-
-      span.odds {
-        display: block;
-        font-size: smaller;
-        background: $light-gray;
-        color: $dark-gray;
-        padding: 2px 4px;
-        border-radius: 4px;
-      }
-    }
+  .odds {
+    display: block;
+    font-size: 0.8rem;
+    opacity: 0.7;
   }
 
-  .bet-operations {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 2rem;
+  &:hover {
+    background-color: var(--primary-accent);
+    color: var(--text-dark);
+    border-color: var(--primary-accent);
+  }
 
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      border: none;
-      background-color: $dark-gray;
-      color: white;
-      cursor: pointer;
-      width: 80%;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
 
-      &:hover {
-        background-color: color.adjust($dark-gray, $lightness: 10%);
-      }
-    }
+.bet-operations {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.operation-button {
+  background-color: var(--background-dark);
+  border: 1px solid var(--primary-accent);
+  color: var(--primary-accent);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: var(--primary-accent);
+    color: var(--text-dark);
   }
 }
 
 @media (max-width: 768px) {
-  .bet-panel {
-    flex-direction: column;
+  .bet-options-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
   }
-
-  .bet-options {
-    justify-content: space-around;
-
-    button {
-      width: 45%;
-    }
-  }
-}
-
-.chip {
-  cursor: pointer;
-  padding: 10px;
-  margin: 5px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  display: inline-block;
-}
-
-.chip.selected {
-  border-color: #ffdd55;
-  background-color: #ffe680;
 }

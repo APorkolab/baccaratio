@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { GameService } from '../game.service';
 import { firstValueFrom } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 import { Card } from 'src/app/model/card';
 import { CommonModule } from '@angular/common';
 
@@ -49,7 +50,7 @@ export class BetPanelComponent {
     new EventEmitter();
 
   loading: boolean = false;
-  constructor(private gameService: GameService) { }
+  constructor(private gameService: GameService, private toastr: ToastrService) { }
 
   selectChip(chip: Chip): void {
     this.selectedChip = chip;
@@ -78,22 +79,24 @@ export class BetPanelComponent {
 
   async placeBet(betType: string): Promise<void> {
     if (this.currentBetAmount <= 0) {
-      console.error('No bet amount selected');
-      alert('Please select a bet amount before placing a bet.');
+      this.toastr.warning('Please select a bet amount before placing a bet.');
       return;
     }
 
     this.loading = true;
     try {
       await firstValueFrom(this.gameService.placeBet(betType, this.currentBetAmount));
+      this.toastr.success(`Bet of ${this.currentBetAmount} on ${betType.toUpperCase()} accepted!`, 'Bet Placed');
       this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
+
       const gameResponse = await firstValueFrom(this.gameService.playGame());
 
       setTimeout(() => {
         this.currentBetAmount = 0;
         this.currentBetAmountChanged.emit(this.currentBetAmount);
         this.betHistory = [];
-        alert(gameResponse.result);
+        // The game result is shown visually, a toast for it might be too much.
+        this.toastr.info(`Round finished. Winner: ${gameResponse.result}`, 'Round Over');
       }, 7000);
 
       this.animateCards(gameResponse.cards.playerCards, gameResponse.cards.bankerCards);
@@ -102,7 +105,7 @@ export class BetPanelComponent {
       });
     } catch (error: any) {
       console.error('Error during bet or game play:', error);
-      alert(error.message || "An error occurred during the bet or game.");
+      this.toastr.error(error.message || "An error occurred during the bet or game.", 'Error');
     } finally {
       this.loading = false;
     }

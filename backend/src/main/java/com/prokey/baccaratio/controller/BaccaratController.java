@@ -1,18 +1,19 @@
 package com.prokey.baccaratio.controller;
 
-import com.prokey.baccaratio.model.Card;
+import com.prokey.baccaratio.controller.dto.BetResponse;
+import com.prokey.baccaratio.controller.dto.GameResponse;
+import com.prokey.baccaratio.model.Game;
 import com.prokey.baccaratio.model.Player;
 import com.prokey.baccaratio.service.BaccaratService;
 import com.prokey.baccaratio.service.BaccaratService.BetType;
-
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.security.Principal;
 
 @RestController
+@RequestMapping("/baccarat")
 public class BaccaratController {
     private final BaccaratService baccaratService;
 
@@ -20,102 +21,86 @@ public class BaccaratController {
         this.baccaratService = baccaratService;
     }
 
+    private Game getGame(HttpSession session, Principal principal) {
+        String username = principal.getName();
+        return baccaratService.getGameForSession(session.getId(), username);
+    }
+
     @PostMapping("/bet/{type}/{amount}")
-    public ResponseEntity<?> placeBet(@PathVariable("type") String type, @PathVariable("amount") int amount) {
+    public ResponseEntity<BetResponse> placeBet(@PathVariable String type, @PathVariable int amount, HttpSession session, Principal principal) {
         if (amount <= 0) {
-            return ResponseEntity.badRequest().body(Map.of("message", "The bet amount must be positive."));
+            throw new IllegalArgumentException("Bet amount must be positive.");
         }
-        if (!baccaratService.isValidType(type)) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid bet type."));
-        }
-        if (baccaratService.getPlayer().getChips() < amount) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Nincs elég zsetonod ehhez a fogadáshoz."));
-        }
-        try {
-            BetType betType = BaccaratService.BetType.valueOf(type.toUpperCase());
-            boolean betPlaced = baccaratService.placeBet(betType, amount);
-            if (betPlaced) {
-                return ResponseEntity
-                        .ok(Map.of("message", String.format("Fogadás megtörtént: %s, összeg: %d", type, amount)));
-            } else {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("message", "Failed to place bet. Check the available chips."));
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid bet type."));
+        if (!baccaratService.isValidBetType(type)) {
+            throw new IllegalArgumentException("Invalid bet type.");
         }
 
+        Game game = getGame(session, principal);
+        Player player = game.getPlayer();
+
+        if (player.getChips() < amount) {
+            throw new IllegalArgumentException("Insufficient chips for this bet.");
+        }
+
+        BetType betType = BetType.valueOf(type.toUpperCase());
+        game.placeBet(betType, amount);
+
+        String message = String.format("Bet placed on %s with amount %d", type, amount);
+        BetResponse response = new BetResponse(message, player.getChips());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/play")
-    public String play() {
-        return baccaratService.playRound();
+    public ResponseEntity<GameResponse> play(HttpSession session, Principal principal) {
+        Game game = getGame(session, principal);
+        String result = game.playRound();
+
+        baccaratService.savePlayerState(game.getPlayer());
+
+        GameResponse response = new GameResponse(
+            result,
+            game.getPlayerCards(),
+            game.getBankerCards(),
+            game.getPlayer().getChips(),
+            "Round played successfully."
+        );
+
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/cards")
-    public Map<String, List<Card>> getCards() {
-        Map<String, List<Card>> cards = new HashMap<>();
-        cards.put("playerCards", baccaratService.getPlayerCards());
-        cards.put("bankerCards", baccaratService.getBankerCards());
-        return cards;
+    @GetMapping("/state")
+    public ResponseEntity<GameResponse> getGameState(HttpSession session, Principal principal) {
+        Game game = getGame(session, principal);
+
+        GameResponse response = new GameResponse(
+            game.getLastResult(),
+            game.getPlayerCards(),
+            game.getBankerCards(),
+            game.getPlayer().getChips(),
+            "Current game state."
+        );
+
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/result")
-    public String getLastResult() {
-        return String.format("Last result: %s. Your bet: %s. Remaining chips: %d",
-                baccaratService.getLastResult(),
-                baccaratService.getBetType(),
-                baccaratService.getChips());
-    }
+    @PostMapping("/reset")
+    public ResponseEntity<GameResponse> resetGame(HttpSession session, Principal principal) {
+        Game game = getGame(session, principal);
+        Player player = game.getPlayer();
+        player.setChips(1000); // Reset chips to default
+        baccaratService.savePlayerState(player);
 
-    @GetMapping("/player")
-    public ResponseEntity<?> getPlayer() {
-        Player player = baccaratService.getPlayer();
-        return player != null ? ResponseEntity.ok(player)
-                : ResponseEntity.badRequest().body(Map.of("message", "Player not found."));
-    }
+        baccaratService.endGameForSession(session.getId());
+        Game newGame = getGame(session, principal);
 
-    @GetMapping("/player/chips")
-    public ResponseEntity<?> getPlayerChips() {
-        Player player = baccaratService.getPlayer();
-        return player != null ? ResponseEntity.ok(Map.of("chips", player.getChips()))
-                : ResponseEntity.badRequest().body(Map.of("message", "Player not found."));
-    }
+        GameResponse response = new GameResponse(
+            "Game reset",
+            newGame.getPlayerCards(),
+            newGame.getBankerCards(),
+            newGame.getPlayer().getChips(),
+            "Game has been reset."
+        );
 
-    @PostMapping("/player/chips")
-    public ResponseEntity<?> updateChips(@RequestBody Map<String, Integer> chipsUpdate) {
-        int amount = chipsUpdate.getOrDefault("amount", 0);
-        Player updatedPlayer = baccaratService.updatePlayerChips(amount);
-        if (updatedPlayer != null) {
-            return ResponseEntity.ok(Map.of("message", "Zsetonok sikeresen frissítve.", "chips", updatedPlayer.getChips()));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of("message", "Nem sikerült frissíteni a zsetonokat."));
-        }
-    }
-
-    @GetMapping("/player/name")
-    public ResponseEntity<?> getPlayerName() {
-        Player player = baccaratService.getPlayer();
-        return player != null && player.getName() != null
-                ? ResponseEntity.ok(Map.of("name", player.getName()))
-                : ResponseEntity.badRequest().body(Map.of("message", "Player name is not set."));
-    }
-
-    @PutMapping("/player/name")
-    public ResponseEntity<?> setPlayerName(@RequestBody Map<String, String> requestBody) {
-        String name = requestBody.get("name");
-        Player player = baccaratService.getPlayer();
-        if (player != null && name != null && !name.trim().isEmpty()) {
-            player.setName(name);
-            return ResponseEntity.ok(Map.of("message", "Player name updated successfully."));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid name or player not found."));
-        }
-    }
-
-    @GetMapping("/")
-    public Map<String, String> home() {
-        return Map.of("message",
-                "Welcome to the Baccarat Game API! Default URL of Swagger Docs: http://localhost:8080/swagger-ui/index.html");
+        return ResponseEntity.ok(response);
     }
 }

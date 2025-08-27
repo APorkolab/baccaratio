@@ -1,27 +1,10 @@
-<div class="player-status">
-	<div>
-		<label>Player Name:</label>
-		<span *ngIf="!editingName">{{ playerName }}</span>
-		<input *ngIf="editingName" type="text" [(ngModel)]="playerName">
-		<button *ngIf="!editingName" (click)="editingName = true">Edit</button>
-		<button *ngIf="editingName" (click)="setPlayerName(playerName); editingName = false">OK</button>
-		<button *ngIf="editingName" (click)="editingName = false">Cancel</button>
-	</div>
-	<div>
-		<button class="author-button" (mouseenter)="showAuthorModal()">Szerző</button>
-	</div>
-	<div>
-		<label>Current Bet:</label>
-		<div class="current-bet-amount">
-			<span>{{ currentBet }}</span>
-		</div>
-	</div>
-	<div>
-		<label>Balance:</label>
-		<span *ngIf="!editingBalance">{{ balance }}</span>
-		<input *ngIf="editingBalance" type="number" [(ngModel)]="balance">
-		<button *ngIf="!editingBalance" (click)="editingBalance = true">Edit</button>
-		<button *ngIf="editingBalance" (click)="updateBalance(balance); editingBalance = false">OK</button>
-		<button *ngIf="editingBalance" (click)="editingBalance = false">Cancel</button>
-	</div>
+<div class="player-status-bar">
+  <div class="player-info">
+    <span class="player-name">{{ playerName }}</span>
+    <span class="player-balance">Balance: {{ balance | number }}</span>
+  </div>
+  <div class="actions">
+    <button class="action-button" (click)="resetGame()">Reset Game</button>
+    <button class="action-button logout" (click)="logout()">Logout</button>
+  </div>
 </div>

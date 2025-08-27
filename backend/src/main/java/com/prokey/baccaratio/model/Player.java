@@ -1,11 +1,26 @@
 package com.prokey.baccaratio.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 /**
  * Represents a player in a baccarat game with capabilities to manage chips and handle game outcomes.
  */
+@Entity
 public class Player {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
     private int chips;
+
+    /**
+     * JPA requires a no-arg constructor.
+     */
+    public Player() {
+    }
 
     /**
      * Constructs a new player with a specified name and initial amount of chips.
@@ -21,6 +36,14 @@ public class Player {
         }
         this.name = name;
         this.chips = chips;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setName(String name) {

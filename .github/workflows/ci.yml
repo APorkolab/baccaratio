@@ -99,10 +99,10 @@ jobs:
           distribution: temurin
           java-version: ${{ steps.jd.outputs.java }}
           cache: maven
-      - name: Build (skip tests for stability)
+      - name: Build and Test
         run: |
           cd "${{ needs.detect-paths.outputs.JAVA_DIR }}"
-          mvn -B -q -DskipTests -DskipITs -Dmaven.test.skip=true clean package || mvn -B -q -DskipTests clean package
+          mvn -B verify
 
   # =============== BACKEND: NODE / EXPRESS ===============
   backend-node:
