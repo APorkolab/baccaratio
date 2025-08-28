@@ -8,13 +8,14 @@ import { GameService } from '../game.service';
 import { environment } from 'src/environments/environment';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, query, style, stagger, animate } from '@angular/animations';
+import { BetHistoryComponent } from '../bet-history/bet-history.component';
 
 @Component({
   selector: 'app-game-table',
   templateUrl: './game-table.component.html',
   styleUrls: ['./game-table.component.scss'],
   standalone: true,
-  imports: [CommonModule, PlayerStatusComponent, BetPanelComponent],
+  imports: [CommonModule, PlayerStatusComponent, BetPanelComponent, BetHistoryComponent],
   animations: [
     trigger('cardAnimation', [
       transition('* => *', [
@@ -35,8 +36,6 @@ export class GameTableComponent implements OnInit, OnDestroy {
   handleBetAmountChange(amount: number): void {
     if (this.playerStatusComponent) {
       this.playerStatusComponent.updateCurrentBetAmount(amount);
-    } else {
-      console.warn('playerStatusComponent is not initialized');
     }
   }
 
@@ -79,26 +78,28 @@ export class GameTableComponent implements OnInit, OnDestroy {
 
 
   getCardImage(card: Card): string {
-    if (!card || !card['value'] || !card.suit) {
+    if (!card || !card.value || !card.suit) {
       return '../../../assets/cards/back.png';
     }
 
-    let value = card['value'].toLowerCase();
-    if (value === 'a') {
-      value = 'ace';
-    } else if (value === 'k') {
-      value = 'king';
-    } else if (value === 'q') {
-      value = 'queen';
-    } else if (value === 'j') {
-      value = 'jack';
-    } else if (value === '10') {
-      value = '10';
+    let value = card.value.toLowerCase();
+    switch (value) {
+      case 'a':
+        value = 'ace';
+        break;
+      case 'k':
+        value = 'king';
+        break;
+      case 'q':
+        value = 'queen';
+        break;
+      case 'j':
+        value = 'jack';
+        break;
     }
 
     const suit = card.suit.toLowerCase();
-    let suitName = suit;
-    return `../../../assets/cards/${value}_of_${suitName}.png`;
+    return `../../../assets/cards/${value}_of_${suit}.png`;
   }
 
   showAuthorModal(): void {

@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
 export class PlayerStatusComponent implements OnInit, OnDestroy {
   balance: number = 1000;
   playerName: string = 'Player';
+  currentBetAmount: number = 0;
 
   private balanceSubscription: Subscription | undefined;
 
@@ -56,5 +57,10 @@ export class PlayerStatusComponent implements OnInit, OnDestroy {
       // A toastr message could be added here later to confirm.
       console.log('Game reset requested.');
     });
+  }
+
+  updateCurrentBetAmount(amount: number): void {
+    this.currentBetAmount = amount;
+    this.cdr.detectChanges();
   }
 }

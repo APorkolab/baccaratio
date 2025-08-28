@@ -1,1 +1,10 @@
-<p>bet-history works!</p>
+<div class="bet-history-container">
+  <h3>Bet History</h3>
+  <ul>
+    <li *ngFor="let bet of betHistory">
+      <span>Bet on: {{ bet.type }}</span>
+      <span>Amount: {{ bet.amount }}</span>
+      <span>Result: {{ bet.result }}</span>
+    </li>
+  </ul>
+</div>

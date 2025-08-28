@@ -8,6 +8,7 @@ import { Player } from '../model/player';
 import { GameResponse } from '../model/dto/game-response.dto';
 import { BetResponse } from '../model/dto/bet-response.dto';
 import { PlayerDTO } from '../model/dto/player.dto';
+import { Bet } from '../model/bet';
 
 @Injectable({
   providedIn: 'root',
@@ -17,13 +18,20 @@ export class GameService {
   private playerCardsSubject = new BehaviorSubject<Card[]>([]);
   private bankerCardsSubject = new BehaviorSubject<Card[]>([]);
   private balanceSubject = new BehaviorSubject<number>(1000);
+  private betHistorySubject = new BehaviorSubject<Bet[]>([]);
   balance$ = this.balanceSubject.asObservable();
+  betHistory$ = this.betHistorySubject.asObservable();
   isLoading: boolean = false;
 
   constructor(private http: HttpClient) { }
 
   playerCards$ = this.playerCardsSubject.asObservable();
   bankerCards$ = this.bankerCardsSubject.asObservable();
+
+  addBetToHistory(bet: Bet): void {
+    const currentHistory = this.betHistorySubject.value;
+    this.betHistorySubject.next([...currentHistory, bet]);
+  }
 
   placeBet(type: string, amount: number): Observable<BetResponse> {
     return this.http.post<BetResponse>(`${this.apiUrl}/baccarat/bet/${type}/${amount}`, {}).pipe(
@@ -70,13 +78,23 @@ export class GameService {
     );
   }
 
-  private updateBalance(newBalance: number): void {
+  public updateBalance(newBalance: number): void {
     this.balanceSubject.next(newBalance);
   }
 
-  private updateCards(playerCards: Card[], bankerCards: Card[]): void {
+  public updateCards(playerCards: Card[], bankerCards: Card[]): void {
     this.playerCardsSubject.next(playerCards);
     this.bankerCardsSubject.next(bankerCards);
+  }
+
+  public updatePlayerCards(card: Card): void {
+    const currentCards = this.playerCardsSubject.value;
+    this.playerCardsSubject.next([...currentCards, card]);
+  }
+
+  public updateBankerCards(card: Card): void {
+    const currentCards = this.bankerCardsSubject.value;
+    this.bankerCardsSubject.next([...currentCards, card]);
   }
 
   private handleError(error: HttpErrorResponse) {

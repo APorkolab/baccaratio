@@ -57,6 +57,10 @@ public class BaccaratService {
     public enum BetType {
         PLAYER,
         BANKER,
-        TIE
+        TIE,
+        PLAYERPAIR,
+        BANKERPAIR,
+        EITHERPAIR,
+        PERFECTPAIRONE
     }
 }

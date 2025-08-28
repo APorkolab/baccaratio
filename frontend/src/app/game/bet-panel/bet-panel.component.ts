@@ -90,6 +90,11 @@ export class BetPanelComponent {
       this.betPlaced.emit({ type: betType, amount: this.currentBetAmount });
 
       const gameResponse = await firstValueFrom(this.gameService.playGame());
+      this.gameService.addBetToHistory({
+        type: betType,
+        amount: this.currentBetAmount,
+        result: gameResponse.result,
+      });
 
       setTimeout(() => {
         this.currentBetAmount = 0;
@@ -99,7 +104,7 @@ export class BetPanelComponent {
         this.toastr.info(`Round finished. Winner: ${gameResponse.result}`, 'Round Over');
       }, 7000);
 
-      this.animateCards(gameResponse.cards.playerCards, gameResponse.cards.bankerCards);
+      this.animateCards(gameResponse.playerCards, gameResponse.bankerCards);
       this.gameService.getPlayer().subscribe(updatedPlayer => {
         this.gameService.updateBalance(updatedPlayer.chips);
       });

@@ -2,6 +2,7 @@
 	(hideAuthorModalEvent)="showModal = false"></app-player-status>
 
 <div class="betting-area">
+	<app-bet-history></app-bet-history>
 	<app-bet-panel (currentBetAmountChanged)="handleBetAmountChange($event)" (showAuthorModalEvent)="showModal = true"
 		(hideAuthorModalEvent)="showModal = false"></app-bet-panel>
 </div>
@@ -16,7 +17,7 @@
         <div class="hand-container player-hand">
             <div class="hand">
                 <div *ngFor="let card of playerCards" class="card" [@cardAnimation]>
-                    <img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
+                    <img [src]="getCardImage(card)" [alt]="card.value + ' of ' + card.suit" class="card-image">
                 </div>
             </div>
         </div>
@@ -28,7 +29,7 @@
         <div class="hand-container banker-hand">
             <div class="hand">
                 <div *ngFor="let card of bankerCards" class="card" [@cardAnimation]>
-                    <img [src]="getCardImage(card)" [alt]="card.rank + ' of ' + card.suit" class="card-image">
+                    <img [src]="getCardImage(card)" [alt]="card.value + ' of ' + card.suit" class="card-image">
                 </div>
             </div>
         </div>

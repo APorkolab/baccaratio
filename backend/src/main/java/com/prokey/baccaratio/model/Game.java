@@ -18,6 +18,11 @@ public class Game {
         this.player = player;
     }
 
+    public Game(Player player, Deck deck) {
+        this.player = player;
+        this.deck = deck;
+    }
+
     public boolean placeBet(BetType type, int amount) {
         if (amount <= 0 || this.player.getChips() < amount) {
             return false;
@@ -127,27 +132,57 @@ public class Game {
     }
 
     private void updateChipsBasedOnResult(String winner) {
-        boolean betWon = (betType == BetType.PLAYER && "Player".equals(winner)) ||
-                         (betType == BetType.BANKER && "Banker".equals(winner)) ||
-                         (betType == BetType.TIE && "Tie".equals(winner));
-
-        if ("Tie".equals(winner)) {
-            // On a Tie, the original bet is returned (push)
-            player.win(betAmount);
-            if (betType == BetType.TIE) {
-                // If the bet was on Tie, pay winnings (8:1)
-                player.win(betAmount * 8);
-            }
-        } else if (betWon) {
-            if (betType == BetType.PLAYER) {
-                // Pay 1:1, so return original bet + winning
-                player.win(betAmount * 2);
-            } else if (betType == BetType.BANKER) {
-                // Pay 1:1 with 5% commission. Total return is bet * 1.95
-                player.win((int) (betAmount * 1.95));
-            }
+        switch (betType) {
+            case PLAYER:
+                if ("Player".equals(winner)) {
+                    player.win(betAmount * 2); // 1:1 payout
+                } else if ("Tie".equals(winner)) {
+                    player.win(betAmount); // Push
+                }
+                break;
+            case BANKER:
+                if ("Banker".equals(winner)) {
+                    player.win((int) (betAmount * 1.95)); // 0.95:1 payout
+                } else if ("Tie".equals(winner)) {
+                    player.win(betAmount); // Push
+                }
+                break;
+            case TIE:
+                if ("Tie".equals(winner)) {
+                    player.win(betAmount * 9); // 8:1 payout
+                }
+                break;
+            case PLAYERPAIR:
+                if (isPair(playerCards)) {
+                    player.win(betAmount * 12); // 11:1 payout
+                }
+                break;
+            case BANKERPAIR:
+                if (isPair(bankerCards)) {
+                    player.win(betAmount * 12); // 11:1 payout
+                }
+                break;
+            case EITHERPAIR:
+                if (isPair(playerCards) || isPair(bankerCards)) {
+                    player.win(betAmount * 6); // 5:1 payout
+                }
+                break;
+            case PERFECTPAIRONE:
+                if (isPerfectPair(playerCards) || isPerfectPair(bankerCards)) {
+                    player.win(betAmount * 26); // 25:1 payout
+                }
+                break;
         }
-        // If bet was lost, chips were already deducted, so nothing to do.
+    }
+
+    private boolean isPair(List<Card> cards) {
+        return cards.size() >= 2 && cards.get(0).getValue().equals(cards.get(1).getValue());
+    }
+
+    private boolean isPerfectPair(List<Card> cards) {
+        return cards.size() >= 2 &&
+               cards.get(0).getValue().equals(cards.get(1).getValue()) &&
+               cards.get(0).getSuit().equals(cards.get(1).getSuit());
     }
 
     // Getters for state
