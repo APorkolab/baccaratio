@@ -10,7 +10,7 @@
 
 ## Overview
 
-Baccaratio is a comprehensive web application that combines a backend built with Spring Boot 3.2.4 and a front-end developed using Angular 17.3.1. The primary purpose of Baccaratio is to provide a simulated environment for the popular casino game Baccarat, allowing players to place bets, participate in rounds, and monitor their chip balances. The backend is RESTful, ensuring seamless integration with various front-end applications.
+Baccaratio is a comprehensive web application that combines a backend built with Spring Boot 3.2.4 and a front-end developed using Angular 20.2.1. The primary purpose of Baccaratio is to provide a simulated environment for the popular casino game Baccarat, allowing players to place bets, participate in rounds, and monitor their chip balances. The backend is RESTful, ensuring seamless integration with various front-end applications.
 
 ## Availability
 
@@ -22,7 +22,7 @@ Baccaratio is also available for demonstration purposes at [https://baccaratio.p
 
 - Java JDK 11 or later (the backend was written in Java 17)
 - Maven 3.9.6.
-- Angular 17.3.1 (upgrade from 16.2.6)
+- Angular 20.2.1 (upgrade from 17.3.1)
 
 ### Setup the backend
 
