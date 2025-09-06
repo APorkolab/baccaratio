@@ -207,7 +207,7 @@ jobs:
         env:
           CI: "true"
         run: |
-          npm run test --if-present -- --watch=false --browsers=ChromeHeadless --no-sandbox || echo "Skipping tests."
+          npm run test --if-present -- --watch=false --browsers=ChromeHeadless || echo "Skipping tests."
 
   # =============== TOOL: Manual Angular Full Upgrade PR ===============
   upgrade-angular-loop:
