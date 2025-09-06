@@ -7,7 +7,7 @@ describe('BetHistoryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BetHistoryComponent],
+      imports: [BetHistoryComponent, HttpClientTestingModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BetHistoryComponent);
