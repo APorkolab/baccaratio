@@ -7,7 +7,7 @@ describe('BetPanelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BetPanelComponent], 
+      imports: [BetPanelComponent, HttpClientTestingModule], 
     }).compileComponents();
 
     fixture = TestBed.createComponent(BetPanelComponent);
