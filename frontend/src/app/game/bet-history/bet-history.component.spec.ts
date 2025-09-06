@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BetHistoryComponent } from './bet-history.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('BetHistoryComponent', () => {
   let component: BetHistoryComponent;
