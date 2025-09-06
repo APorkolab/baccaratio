@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BetPanelComponent } from './BetPanelComponent';
+import { BetPanelComponent } from './bet-panel.component';
 
 describe('BetPanelComponent', () => {
   let component: BetPanelComponent;
