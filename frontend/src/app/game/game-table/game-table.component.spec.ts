@@ -7,7 +7,9 @@ describe('GameTableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GameTableComponent],
+      imports: [GameTableComponent,
+               HttpClientTestingModule
+               ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(GameTableComponent);
