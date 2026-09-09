@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { GameService } from '../game.service';
 import { firstValueFrom } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService, ToastOptions } from '../../service/toast.service';
 import { Card } from 'src/app/model/card';
 import { CommonModule } from '@angular/common';
 
@@ -50,7 +50,7 @@ export class BetPanelComponent {
     new EventEmitter();
 
   loading: boolean = false;
-  constructor(private gameService: GameService, private toastr: ToastrService) { }
+  constructor(private gameService: GameService, private toastr: ToastService) { }
 
   selectChip(chip: Chip): void {
     this.selectedChip = chip;

@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameTableComponent } from './game-table.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ToastrModule } from 'ngx-toastr';
 
 describe('GameTableComponent', () => {
   let component: GameTableComponent;
@@ -11,7 +10,6 @@ describe('GameTableComponent', () => {
     await TestBed.configureTestingModule({
       imports: [GameTableComponent,
                HttpClientTestingModule,
-               ToastrModule.forRoot()
                ],
     }).compileComponents();
 

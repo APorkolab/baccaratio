@@ -5,7 +5,6 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './app/auth/auth.interceptor';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideToastr } from 'ngx-toastr';
 
 // Corrected to use functional interceptor
 bootstrapApplication(AppComponent, {
@@ -13,10 +12,5 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(), // required for ngx-toastr
-    provideToastr({ // Optional configuration
-      timeOut: 5000,
-      positionClass: 'toast-bottom-right',
-      preventDuplicates: true,
-    }),
   ]
 }).catch(err => console.error(err));
