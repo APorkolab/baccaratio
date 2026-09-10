@@ -7,8 +7,7 @@ on:
   workflow_dispatch: {} # Manual trigger for the "Tool – Angular Full Upgrade PR (Iterative)" job
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -114,7 +113,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: ${{ needs.detect-paths.outputs.NODE_DIR }}/package-lock.json
       - name: Install
@@ -148,7 +147,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: ${{ needs.detect-paths.outputs.FRONT_DIR }}/package-lock.json
 
@@ -211,6 +210,9 @@ jobs:
 
   # =============== TOOL: Manual Angular Full Upgrade PR ===============
   upgrade-angular-loop:
+    permissions:
+      contents: write
+      pull-requests: write
     name: Tool – Angular Full Upgrade PR (Iterative)
     needs: [detect-paths]
     if: ${{ github.event_name == 'workflow_dispatch' && needs.detect-paths.outputs.FRONT_DIR != '' && needs.detect-paths.outputs.FRONT_IS_ANGULAR == 'true' }}
@@ -224,7 +226,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Clean install (dev deps included)
         run: |
